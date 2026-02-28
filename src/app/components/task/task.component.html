@@ -1,0 +1,26 @@
+<div class="task">
+
+  <div class="task-header">
+    <h3>{{ task.title }}</h3>
+
+    <div class="task-actions">
+      <button class="action-btn edit-btn" (click)="onEdit()">✎</button>
+      <button class="action-btn delete-btn" (click)="onDelete()">🗑</button>
+    </div>
+  </div>
+
+  <p>{{ task.description }}</p>
+
+  @if (task.dueDate) {
+  <div class="due-date">
+    📅 {{ task.dueDate | date:'mediumDate' }}
+  </div>
+  }
+
+  <span [ngClass]="task.priority.toLowerCase()">
+    {{ task.priority }}
+  </span>
+
+
+
+</div>

@@ -1,0 +1,59 @@
+<div class="modal-backdrop">
+  <div class="modal auth-modal">
+    <h3>Sign In</h3>
+
+    <form (ngSubmit)="onSignin()">
+
+      <!-- IDENTIFIER -->
+      <input
+        type="text"
+        placeholder="Office ID or Email"
+        [(ngModel)]="identifier"
+        name="identifier"
+        [class.invalid]="attemptedSubmitSignin && !identifier"
+      />
+      @if(attemptedSubmitSignin && !identifier){
+        <div class="error-msg">
+          Office ID or Email is required
+        </div>
+      }
+
+      <!-- PASSWORD -->
+      <div class="password-wrapper">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Password"
+          [(ngModel)]="password"
+          name="password"
+          [class.invalid]="attemptedSubmitSignin && !password"
+        />
+        <span class="material-icons eye-icon"
+              (click)="showPassword = !showPassword">
+          {{ showPassword ? 'visibility_off' : 'visibility' }}
+        </span>
+      </div>
+      @if(attemptedSubmitSignin && !password){
+        <div class="error-msg">
+          Password is required
+        </div>
+      }
+
+      <div class="modal-actions">
+        <button type="submit" [disabled]="isProcessing">
+          Sign In
+        </button>
+      </div>
+    </form>
+
+    <p class="auth-switch">
+      Don't have an account?
+      <a routerLink="/signup">Sign Up</a>
+    </p>
+  </div>
+</div>
+
+@if(showToast){
+  <div class="toast" [ngClass]="toastType">
+    {{ toastMessage }}
+  </div>
+}

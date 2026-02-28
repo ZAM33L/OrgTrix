@@ -1,0 +1,106 @@
+<div class="modal-backdrop">
+  <div class="modal auth-modal">
+    <h3>Sign Up</h3>
+
+    <form (ngSubmit)="onSignup()">
+
+      <!-- NAME -->
+      <input
+        type="text"
+        placeholder="Name"
+        [(ngModel)]="name"
+        name="name"
+        [class.invalid]="attemptedSubmitSignup && !name"
+      />
+      @if(attemptedSubmitSignup && !name){
+        <div class="error-msg">Name is required</div>
+      }
+
+      <!-- OFFICE ID -->
+      <input
+        type="text"
+        placeholder="Office ID (e.g. OT201210)"
+        [(ngModel)]="officeId"
+        name="officeId"
+        [class.invalid]="attemptedSubmitSignup && !isValidOfficeId()"
+      />
+      @if(attemptedSubmitSignup && !officeId){
+        <div class="error-msg">Office ID is required</div>
+      }
+      @if(attemptedSubmitSignup && officeId && !isValidOfficeId()){
+        <div class="error-msg">Office ID must be like OT123456</div>
+      }
+
+      <!-- EMAIL -->
+      <input
+        type="email"
+        placeholder="Email"
+        [(ngModel)]="email"
+        name="email"
+        [class.invalid]="attemptedSubmitSignup && !isValidEmail()"
+      />
+      @if(attemptedSubmitSignup && !email){
+        <div class="error-msg">Email is required</div>
+      }
+      @if(attemptedSubmitSignup && email && !isValidEmail()){
+        <div class="error-msg">Invalid email format</div>
+      }
+
+      <!-- PASSWORD -->
+      <div class="password-wrapper">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Password"
+          [(ngModel)]="password"
+          name="password"
+          [class.invalid]="attemptedSubmitSignup && !isValidPassword()"
+        />
+        <span class="material-icons eye-icon"
+              (click)="showPassword = !showPassword">
+          {{ showPassword ? 'visibility_off' : 'visibility' }}
+        </span>
+      </div>
+      @if(attemptedSubmitSignup && !password){
+        <div class="error-msg">Password is required</div>
+      }
+      @if(attemptedSubmitSignup && password && !isValidPassword()){
+        <div class="error-msg">Password must be at least 8 characters</div>
+      }
+
+      <!-- CONFIRM PASSWORD -->
+      <div class="password-wrapper">
+        <input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          placeholder="Confirm Password"
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+          [class.invalid]="attemptedSubmitSignup && !passwordsMatch()"
+        />
+        <span class="material-icons eye-icon"
+              (click)="showConfirmPassword = !showConfirmPassword">
+          {{ showConfirmPassword ? 'visibility_off' : 'visibility' }}
+        </span>
+      </div>
+      @if(attemptedSubmitSignup && confirmPassword && !passwordsMatch()){
+        <div class="error-msg">Passwords do not match</div>
+      }
+
+      <div class="modal-actions">
+        <button type="submit" [disabled]="isProcessing">
+          Sign Up
+        </button>
+      </div>
+    </form>
+
+    <p class="auth-switch">
+      Already have an account?
+      <a routerLink="/signin">Sign In</a>
+    </p>
+
+    @if(showToast){
+      <div class="toast" [ngClass]="toastType">
+        {{ toastMessage }}
+      </div>
+    }
+  </div>
+</div>

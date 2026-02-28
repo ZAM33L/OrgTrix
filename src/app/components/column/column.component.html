@@ -1,0 +1,129 @@
+<div class="column">
+  <div class="column-header" [ngStyle]="{'background': getHeaderGradient(color), 'color': getTextColor(color)}">
+    <h2 class="column-title">{{ title }}</h2>
+    <!-- task count wrapper-->
+    <div class="task-count-wrapper">
+
+      <!-- TRIGGER -->
+      <span class="task-count-badge" cdkOverlayOrigin #priorityTrigger="cdkOverlayOrigin"
+        (click)="openPriorityDropdown()">
+        {{ tasks.length }} {{ tasks.length === 1 ? 'Task' : 'Tasks' }}
+      </span>
+
+      <!-- OVERLAY -->
+      <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="priorityTrigger"
+        [cdkConnectedOverlayOpen]="isPriorityDropdownOpen" [cdkConnectedOverlayHasBackdrop]="true"
+        (backdropClick)="closePriorityDropdown()"
+        [cdkConnectedOverlayBackdropClass]="'priority-backdrop'">
+
+        <div class="dropdown-panel priority-dropdown">
+
+          <div class="priority-row high">
+            <div class="left">
+              <span class="dot red-dot"></span>
+              <span>High</span>
+            </div>
+            <div class="count">{{ highCount }}</div>
+          </div>
+
+          <div class="priority-row medium">
+            <div class="left">
+              <span class="dot yellow-dot"></span>
+              <span>Medium</span>
+            </div>
+            <div class="count">{{ mediumCount }}</div>
+          </div>
+
+          <div class="priority-row low">
+            <div class="left">
+              <span class="dot green-dot"></span>
+              <span>Low</span>
+            </div>
+            <div class="count">{{ lowCount }}</div>
+          </div>
+
+        </div>
+
+      </ng-template>
+
+    </div>
+
+    @if (showDeleteAll || columnId !== 'todo') {
+    <div class="menu-container">
+      <button class="menu-btn" (click)="toggleMenu($event)">⋮</button>
+
+
+      @if (isMenuOpen) {
+      <div class="dropdown">
+
+        <button (click)="onSort('priority'); toggleMenu($event)">
+          Sort by Priority
+          @if (sortField === 'priority') {
+          <span>
+            {{ sortDirection === 'asc' ? '↑' : '↓' }}
+          </span>
+          }
+        </button>
+
+
+        <button (click)="onSort('dueDate'); toggleMenu($event)">
+          Sort by Due Date
+          @if (sortField === 'dueDate') {
+          <span>
+            {{ sortDirection === 'asc' ? '↑' : '↓' }}
+          </span>
+          }
+        </button>
+
+        <button (click)="onResetSort(); toggleMenu($event)">
+          Reset Sorting
+        </button>
+
+
+        @if (columnId !== 'todo') {
+        <button (click)="onAddTask(); toggleMenu($event)">
+          Add Task
+        </button>
+        }
+
+        @if (showDeleteAll) {
+        <button (click)="onDeleteAll(); toggleMenu($event)">
+          Delete All Tasks
+        </button>
+        }
+        @if (columnId !== 'todo') {
+        <button (click)="onDeleteColumn()">
+          Delete Column
+        </button>
+        }
+
+      </div>
+      }
+    </div>
+    }
+  </div>
+
+  <!-- TASK LIST -->
+  <div cdkDropList [id]="columnId" [cdkDropListData]="tasks" [cdkDropListConnectedTo]="connectedTo" class="task-list"
+    (cdkDropListDropped)="drop($event)">
+    @if(tasks.length === 0){
+    <div class="empty-placeholder">
+      <p>No tasks at the moment .
+        <br>Drop your tasks here
+      </p>
+    </div>
+    }
+    @for (task of tasks; track task.id) {
+    <div cdkDrag>
+      <app-task [task]="task" (edit)="onEdit($event)" (delete)="onDelete($event)">
+      </app-task>
+    </div>
+    }
+  </div>
+
+  @if (showAddButton && columnId === 'todo') {
+  <button class="add-task-btn" (click)="onAddTask()">
+    + Add Task
+  </button>
+  }
+</div>

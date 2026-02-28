@@ -1,0 +1,586 @@
+<header class="app-header">
+
+  <!-- LEFT SIDE -->
+  <div class="header-left">
+    <div class="header-icon">
+      <span class="block red"></span>
+      <span class="block yellow"></span>
+      <span class="block green"></span>
+      <span class="block blue"></span>
+    </div>
+    <h1>OrgTrix</h1>
+  </div>
+
+  <!-- RIGHT SIDE (Logged In User) -->
+  @if(currentUser){
+  <div class="header-user">
+    <div class="avatar">
+      {{ (currentUser.name || currentUser.officeId)?.charAt(0) }}
+    </div>
+    <span class="username">
+      {{ currentUser.name || currentUser.officeId }}
+    </span>
+  </div>
+  }
+
+</header>
+<div class="board-toolbar">
+
+  <!-- LEFT SIDE (Desktop Only) -->
+  <div class="toolbar-left desktop-only">
+    <button class="add-column-btn" (click)="openAddColumnModal()">
+      Add Column
+    </button>
+
+    <button class="edit-column-btn" (click)="openEditColumnModal()">
+      Edit Column
+    </button>
+  </div>
+
+  <!-- RIGHT SIDE MENU -->
+  <div class="toolbar-menu">
+
+    <button class="menu-btn" (click)="toggleToolbarMenu($event)">
+      ☰
+    </button>
+
+    @if(isToolbarMenuOpen){
+    <div class="dropdown">
+
+      <!-- Mobile Only Actions -->
+      <div class="mobile-only">
+        <button (click)="openAddColumnModal(); closeToolbarMenu()">
+          Add Column
+        </button>
+
+        <button (click)="openEditColumnModal(); closeToolbarMenu()">
+          Edit Column
+        </button>
+
+        <hr />
+      </div>
+
+      <!-- Always Visible -->
+      <button (click)="openResetBoardConfirm(); closeToolbarMenu()">
+        Reset Board
+      </button>
+
+      <button (click)="openLogoutConfirm(); closeToolbarMenu()">
+        Signout
+      </button>
+
+    </div>
+    }
+
+  </div>
+
+</div>
+
+<div class="board-layout" cdkDropListGroup cdkScrollable>
+
+  @for (column of columns; track column.id) {
+  <app-column [columnId]="column.id" [connectedTo]="connectedColumnIds" [title]="column.title" [tasks]="column.tasks"
+    [color]="column.color" [showAddButton]="true" [showDeleteAll]="true" (addTask)="openAddModal(column.id)"
+    (deleteAll)="openDeleteConfirm(column.id)" (edit)="openEditModal($event)" (delete)="openTaskDeleteConfirm($event)"
+    [isMenuOpen]="activeMenuColumnId === column.id" (menuToggle)="toggleMenu(column.id)"
+    (sort)="sortColumn(column, $event)" [sortField]="column.sortField ?? undefined"
+    [sortDirection]="column.sortDirection ?? undefined" (resetSort)="resetColumnSort(column)"
+    (deleteColumn)="openDeleteColumnConfirm($event)" (taskMoved)="onTaskMoved()">
+  </app-column>
+  }
+
+</div>
+
+
+<!-- ADD MODAL -->
+@if (showAddModal) {
+<div class="modal-backdrop">
+  <div class="modal">
+    <h3>New Task</h3>
+
+    <input type="text" placeholder="Title" [(ngModel)]="newTask.title"
+      [class.invalid]="!newTask.title.trim() && attemptedSubmit">
+    @if(!newTask.title.trim() && attemptedSubmit){
+    <div class="error-msg">
+      Title is required
+    </div>
+    }
+    <textarea placeholder="Description" [(ngModel)]="newTask.description"></textarea>
+
+    <div class="cdk-select" cdkOverlayOrigin #addTrigger="cdkOverlayOrigin" (click)="toggleAddDropdown()">
+
+      {{ newTask.priority || 'Select Priority' }}
+    </div>
+
+    <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="addTrigger"
+      [cdkConnectedOverlayOpen]="isAddDropdownOpen" [cdkConnectedOverlayHasBackdrop]="true"
+      (backdropClick)="closeAddDropdown()">
+
+      <div class="dropdown-panel priority-dropdown">
+        <div class="option high" (click)="selectAddPriority('High')">
+          <span class="dot red-dot"></span>
+          High
+        </div>
+
+        <div class="option medium" (click)="selectAddPriority('Medium')">
+          <span class="dot yellow-dot"></span>
+          Medium
+        </div>
+
+        <div class="option low" (click)="selectAddPriority('Low')">
+          <span class="dot green-dot"></span>
+          Low
+        </div>
+      </div>
+
+    </ng-template>
+
+    <div class="cdk-select" cdkOverlayOrigin #addDateTrigger="cdkOverlayOrigin" (click)="toggleAddDate()"
+      [class.invalid]="!newTask.dueDate && attemptedSubmit">
+
+      {{ newTask.dueDate ? (newTask.dueDate | date:'mediumDate') : 'Select Due Date' }}
+    </div>
+    @if(!newTask.dueDate && attemptedSubmit){
+    <div class="error-msg">
+      Due date is required
+    </div>
+    }
+
+    <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="addDateTrigger"
+      [cdkConnectedOverlayOpen]="isAddDateOpen" [cdkConnectedOverlayHasBackdrop]="true"
+      [cdkConnectedOverlayPositions]="dateOverlayPositions" (backdropClick)="closeAddDate()">
+
+      <div class="date-panel">
+
+        <!-- Calendar Header -->
+        <div class="calendar-header">
+
+          <div class="year-controls">
+            <button (click)="previousYear()">«</button>
+            <button (click)="previousMonth()">‹</button>
+          </div>
+
+          <span class="month-label">
+            {{ currentMonth | date:'MMMM yyyy' }}
+          </span>
+
+          <div class="year-controls">
+            <button (click)="nextMonth()">›</button>
+            <button (click)="nextYear()">»</button>
+          </div>
+
+        </div>
+
+        <!-- Days Grid -->
+        <div class="date-cell" *ngFor="let day of getDaysInMonth()" [class.selected]="newTask.dueDate &&
+         newTask.dueDate.getDate() === day.getDate() &&
+         newTask.dueDate.getMonth() === day.getMonth() &&
+         newTask.dueDate.getFullYear() === day.getFullYear()" (click)="selectAddDate(day)"
+          [class.past]="isPastDate(day)">
+
+          {{ day.getDate() }}
+        </div>
+
+      </div>
+
+
+    </ng-template>
+
+
+    <div class="modal-actions">
+      <button (click)="addTask()">Add</button>
+      <button (click)="closeAddModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+}
+
+
+<!-- EDIT MODAL -->
+@if (showEditModal && editingTask) {
+<div class="modal-backdrop">
+  <div class="modal">
+    <h3>Edit Task</h3>
+
+    <input type="text" [(ngModel)]="editingTask.title"
+      [class.invalid]="!editingTask.title.trim() && attemptedEditSubmit">
+    @if(!editingTask.title.trim() && attemptedEditSubmit){
+    <div class="error-msg">
+      Title is required
+    </div>
+    }
+    <textarea [(ngModel)]="editingTask.description"></textarea>
+
+    <div class="cdk-select" cdkOverlayOrigin #editTrigger="cdkOverlayOrigin" (click)="toggleEditDropdown()"> {{
+      editingTask.priority || 'Select Priority' }} </div> <ng-template cdk-connected-overlay
+      [cdkConnectedOverlayOrigin]="editTrigger" [cdkConnectedOverlayOpen]="isEditDropdownOpen"
+      [cdkConnectedOverlayHasBackdrop]="true" (backdropClick)="closeEditDropdown()">
+
+      <div class="dropdown-panel priority-dropdown">
+        <div class="option high" (click)="selectEditPriority('High')">
+          <span class="dot red-dot"></span>
+          High
+        </div>
+
+        <div class="option medium" (click)="selectEditPriority('Medium')">
+          <span class="dot yellow-dot"></span>
+          Medium
+        </div>
+
+        <div class="option low" (click)="selectEditPriority('Low')">
+          <span class="dot green-dot"></span>
+          Low
+        </div>
+      </div>
+
+    </ng-template>
+
+    <div class="cdk-select" cdkOverlayOrigin #editDateTrigger="cdkOverlayOrigin" (click)="toggleEditDate()">
+
+      {{ editingTask.dueDate ? (editingTask.dueDate | date:'mediumDate') : 'Select Due Date' }}
+    </div>
+
+    <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="editDateTrigger"
+      [cdkConnectedOverlayOpen]="isEditDateOpen" [cdkConnectedOverlayHasBackdrop]="true"
+      [cdkConnectedOverlayPositions]="dateOverlayPositions" (backdropClick)="closeEditDate()">
+
+      <div class="date-panel">
+
+        <!-- Calendar Header -->
+        <div class="calendar-header">
+
+          <div class="year-controls">
+            <button (click)="previousYear()">«</button>
+            <button (click)="previousMonth()">‹</button>
+          </div>
+
+          <span class="month-label">
+            {{ currentMonth | date:'MMMM yyyy' }}
+          </span>
+
+          <div class="year-controls">
+            <button (click)="nextMonth()">›</button>
+            <button (click)="nextYear()">»</button>
+          </div>
+
+        </div>
+
+        <!-- Days Grid -->
+        <div class="date-cell" *ngFor="let day of getDaysInMonth()" [class.selected]="editingTask.dueDate &&
+         editingTask.dueDate.getDate() === day.getDate() &&
+         editingTask.dueDate.getMonth() === day.getMonth() &&
+         editingTask.dueDate.getFullYear() === day.getFullYear()" (click)="selectEditDate(day)"
+          [class.past]="isPastDate(day)">
+
+          {{ day.getDate() }}
+        </div>
+
+      </div>
+
+    </ng-template>
+
+    <div class="modal-actions">
+      <button (click)="updateTask()">Update</button>
+      <button (click)="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+}
+
+
+<!-- DELETE CONFIRM -->
+@if (showDeleteConfirm) {
+<div class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="material-icons modal-icon danger-icon">
+        delete_sweep
+      </span>
+      <h3>Delete All Tasks</h3>
+    </div>
+    <p>Are you sure you want to delete all tasks?</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeDeleteConfirm()">
+        Cancel
+      </button>
+
+      <button class="danger-btn" (click)="confirmDelete()">
+        Yes, Delete
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- DELETE SINGLE TASK CONFIRM -->
+@if (showTaskDeleteConfirm) {
+<div class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="material-icons modal-icon danger-icon">
+        delete_forever
+      </span>
+      <h3>Delete Task</h3>
+    </div>
+    <p>Are you sure you want to delete this task?</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeTaskDeleteConfirm()">
+        Cancel
+      </button>
+
+      <button class="danger-btn" (click)="confirmTaskDelete()">
+        Yes, Delete
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!--Add Column Modal-->
+@if (showAddColumnModal) {
+<div class="modal-backdrop">
+  <div class="modal">
+    <h3>Add New Column</h3>
+
+    <!-- TITLE -->
+    <input type="text" placeholder="Column Title" [(ngModel)]="columnTitleInput"
+      [class.invalid]="!columnTitleInput.trim() && attemptedColumnSubmit" />
+    @if (!columnTitleInput.trim() && attemptedColumnSubmit) {
+    <div class="error-msg">
+      Column title is required
+    </div>
+    }
+
+    <!-- COLOR SELECT (CDK) -->
+    <div class="cdk-select" cdkOverlayOrigin #colorTrigger="cdkOverlayOrigin" (click)="toggleColumnColor()">
+      {{ columnColorInput || 'Select Color' }}
+    </div>
+
+    <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="colorTrigger"
+      [cdkConnectedOverlayOpen]="isColumnColorOpen" [cdkConnectedOverlayHasBackdrop]="true"
+      (backdropClick)="closeColumnColor()">
+      <div class="color-palette">
+        @for (color of availableColors; track color.value) {
+        <div class="color-swatch" [ngStyle]="{'background-color': color.value}"
+          [class.selected]="columnColorInput === color.value" title="{{color.name}}"
+          (click)="columnColorInput = color.value; closeColumnColor()">
+        </div>
+        }
+      </div>
+    </ng-template>
+
+
+    <!-- POSITION SELECT (CDK) -->
+    <div class="cdk-select" cdkOverlayOrigin #positionTrigger="cdkOverlayOrigin" (click)="toggleColumnPosition()">
+      Insert at:
+      @if (columnInsertPosition === columns.length) {
+      End
+      } @else {
+      Before "{{ columns[columnInsertPosition]?.title }}"
+      }
+    </div>
+
+    <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="positionTrigger"
+      [cdkConnectedOverlayOpen]="isColumnPositionOpen" [cdkConnectedOverlayHasBackdrop]="true"
+      (backdropClick)="closeColumnPosition()">
+      <div class="dropdown-panel">
+        @for (column of columns; let i = $index; track column.id) {
+        <div class="option" (click)="columnInsertPosition=i; closeColumnPosition()">
+          Before "{{ column.title }}"
+        </div>
+        }
+
+        <div class="option" (click)="columnInsertPosition=columns.length; closeColumnPosition()">
+          At End
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- ACTION BUTTONS -->
+    <div class="modal-actions">
+      <button (click)="addColumn()">Add</button>
+      <button (click)="closeAddColumnModal()">Cancel</button>
+    </div>
+
+  </div>
+</div>
+}
+<!--delete column modal-->
+
+@if (showColumnDeleteConfirm){
+<div class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="material-icons modal-icon danger-icon">
+        folder_delete
+      </span>
+      <h3>Delete Column</h3>
+    </div>
+    <p>Are you sure you want to delete this column and all its tasks?</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeDeleteColumnConfirm()">Cancel</button>
+      <button class="danger-btn" (click)="confirmColumnDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- RESET BOARD MODAL -->
+
+@if(showResetBoardConfirm){
+<div class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="material-icons modal-icon">restart_alt</span>
+      <h3>Reset Board</h3>
+    </div>
+    <p>Are you sure you want to reset the board ? </p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeResetBoardConfirm()">Cancel</button>
+      <button class="danger-btn" (click)="confirmResetBoard()">Yes, Reset</button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- EDIT COLUMN MODAL -->
+@if (showEditColumnModal) {
+<div class="modal-backdrop">
+  <div class="modal">
+    <h3>Edit Column</h3>
+
+    <!-- SELECT COLUMN TO EDIT -->
+    <div class="cdk-select" cdkOverlayOrigin #editColumnTrigger="cdkOverlayOrigin" (click)="toggleEditColumnSelect()">
+
+      @if (editColumnId) {
+      {{ selectedEditColumn?.title }}
+      } @else {
+      Select Column
+      }
+    </div>
+
+    <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="editColumnTrigger"
+      [cdkConnectedOverlayOpen]="isEditColumnSelectOpen" [cdkConnectedOverlayHasBackdrop]="true"
+      (backdropClick)="closeEditColumnSelect()">
+
+      <div class="dropdown-panel">
+        @for (column of columns; track column.id) {
+        <div class="option" (click)="selectColumnToEdit(column.id); closeEditColumnSelect()">
+          {{ column.title }}
+        </div>
+        }
+      </div>
+
+    </ng-template>
+
+
+    <!-- TITLE -->
+    <input type="text" placeholder="Column Title" [(ngModel)]="editColumnTitle"
+      [class.invalid]="!editColumnTitle.trim() && attemptedColumnEditSubmit" />
+
+    @if(!editColumnTitle.trim() && attemptedColumnEditSubmit){
+    <div class="error-msg">
+      Column title is required
+    </div>
+    }
+    <!-- COLOR SELECT -->
+    <div class="cdk-select" cdkOverlayOrigin #editColorTrigger="cdkOverlayOrigin" (click)="toggleEditColumnColor()">
+
+      {{ editColumnColor || 'Select Color' }}
+    </div>
+
+    <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="editColorTrigger"
+      [cdkConnectedOverlayOpen]="isEditColumnColorOpen" [cdkConnectedOverlayHasBackdrop]="true"
+      (backdropClick)="closeEditColumnColor()">
+
+      <div class="color-palette">
+        @for (color of availableColors; track color.value) {
+        <div class="color-swatch" [ngStyle]="{'background-color': color.value}"
+          [class.selected]="editColumnColor === color.value" title="{{color.name}}"
+          (click)="editColumnColor = color.value; closeEditColumnColor()">
+        </div>
+        }
+      </div>
+
+    </ng-template>
+
+
+    <!-- POSITION SELECT -->
+    <div class="cdk-select" cdkOverlayOrigin #editPositionTrigger="cdkOverlayOrigin"
+      (click)="toggleEditColumnPosition()">
+
+      Move to:
+      @if (editColumnPosition === columns.length) {
+      End
+      } @else {
+      Before "{{ columns[editColumnPosition]?.title }}"
+      }
+    </div>
+
+    <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="editPositionTrigger"
+      [cdkConnectedOverlayOpen]="isEditColumnPositionOpen" [cdkConnectedOverlayHasBackdrop]="true"
+      (backdropClick)="closeEditColumnPosition()">
+
+      <div class="dropdown-panel">
+
+        @for (column of columns; let i = $index; track column.id) {
+        <div class="option" (click)="editColumnPosition = i; closeEditColumnPosition()">
+          Before "{{ column.title }}"
+        </div>
+        }
+
+        <div class="option" (click)="editColumnPosition = columns.length; closeEditColumnPosition()">
+          At End
+        </div>
+
+      </div>
+
+    </ng-template>
+
+
+    <!-- ACTION BUTTONS -->
+    <div class="modal-actions">
+      <button (click)="updateColumn()">Update</button>
+      <button (click)="closeEditColumnModal()">Cancel</button>
+    </div>
+
+  </div>
+</div>
+}
+
+<!-- LOGOUT CONFIRM -->
+@if (showLogoutConfirm) {
+<div class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="material-icons modal-icon warning-icon">
+        logout
+      </span>
+      <h3>Signout</h3>
+    </div>
+    <p>Are you sure you want to signout?</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeLogoutConfirm()">
+        Cancel
+      </button>
+
+      <button class="danger-btn" (click)="confirmLogout()">
+        Yes, Signout
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- toast container -->
+
+@if (showToast) {
+<div class="toast" [ngClass]="toastType">
+  {{toastMessage}}
+</div>
+}
