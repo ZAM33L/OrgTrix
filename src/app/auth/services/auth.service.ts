@@ -1,105 +1,199 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from '../../models/user.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { switchMap, map, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
 
-  private usersKey = 'orgtrix_users';
+  // private usersKey = 'orgtrix_users'; //old
+  private apiUrl = 'http://localhost:3000/users'; //new
   private currentUserKey = 'orgtrix_current_user';
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private http: HttpClient) { }
 
-  //get all users from localStorage
-  private getUsers(): User[] {
-    const users = JSON.parse(localStorage.getItem(this.usersKey) || '[]')
-    console.log('[AuthService] Loaded Users:', users);
-    return users;
-  }
+  //old - localstorage
 
-  //save users to localstorage
-  private saveUsers(users: User[]) {
-    console.log('[AuthService] Saving Users:', users);
-    localStorage.setItem(this.usersKey, JSON.stringify(users))
-  }
+  // //get all users from localStorage
+  // private getUsers(): User[] {
+  //   const users = JSON.parse(localStorage.getItem(this.usersKey) || '[]')
+  //   console.log('[AuthService] Loaded Users:', users);
+  //   return users;
+  // }
 
-  //signup
+  // //save users to localstorage
+  // private saveUsers(users: User[]) {
+  //   console.log('[AuthService] Saving Users:', users);
+  //   localStorage.setItem(this.usersKey, JSON.stringify(users))
+  // }
+
+  // //signup
+
+  // signup(
+  //   name: string,
+  //   email: string,
+  //   password: string,
+  //   officeId: string
+  // ): { success: boolean; message: string } {
+
+  //   console.log('[AuthService] Signup Attempt:', email);
+
+  //   const users = this.getUsers();
+
+  //   // Check if email already exists
+  //   const existingUser = users.find(u => u.email === email);
+  //   if (existingUser) {
+  //     console.warn('[AuthService] Signup Failed - Email exists');
+  //     return { success: false, message: 'Email already exists!' };
+  //   }
+
+  //   // Check if Office ID already exists
+  //   const existingOffice = users.find(u => u.officeId === officeId);
+  //   if (existingOffice) {
+  //     console.warn('[AuthService] Signup Failed - Office ID exists');
+  //     return { success: false, message: 'Office ID already exists!' };
+  //   }
+
+  //   // Create new user
+  //   const newUser: User = {
+  //     id: crypto.randomUUID(),
+  //     name,
+  //     email,
+  //     password,
+  //     officeId
+  //   };
+
+  //   users.push(newUser);
+  //   this.saveUsers(users);
+
+  //   console.log('[AuthService] Signup Successful:', newUser);
+
+  //   return { success: true, message: 'Signup successful!' };
+  // }
+
+  //OLD - LOCALSTORAGE
+
+  // //signin
+
+  // signin(
+  //   identifier: string,
+  //   password: string
+  // ): { success: boolean; message: string } {
+
+  //   console.log('[AuthService] Signin Attempt:', identifier);
+
+  //   const users = this.getUsers();
+
+  //   // Normalize identifier (trim spaces)
+  //   identifier = identifier.trim();
+
+  //   const user = users.find(u =>
+  //     (u.email === identifier || u.officeId === identifier) &&
+  //     u.password === password
+  //   );
+
+  //   if (!user) {
+  //     console.warn('[AuthService] Signin Failed - Invalid credentials');
+  //     return { success: false, message: 'Invalid Office ID / Email or Password!' };
+  //   }
+
+  //   localStorage.setItem(this.currentUserKey, JSON.stringify(user));
+
+  //   console.log('[AuthService] Signin Successful:', user);
+
+  //   return { success: true, message: 'Login successful!' };
+  // }
+
+  //NEW - API BASED
 
   signup(
     name: string,
     email: string,
     password: string,
     officeId: string
-  ): { success: boolean; message: string } {
+  ): Observable<{ success: boolean; message: string }> {
 
-    console.log('[AuthService] Signup Attempt:', email);
+    return this.http.get<User[]>(this.apiUrl).pipe(
 
-    const users = this.getUsers();
+      switchMap(users => {
 
-    // Check if email already exists
-    const existingUser = users.find(u => u.email === email);
-    if (existingUser) {
-      console.warn('[AuthService] Signup Failed - Email exists');
-      return { success: false, message: 'Email already exists!' };
-    }
+        const emailExists = users.find(u => u.email === email);
+        if (emailExists) {
+          return of({ success: false, message: 'Email already exists!' });
+        }
 
-    // Check if Office ID already exists
-    const existingOffice = users.find(u => u.officeId === officeId);
-    if (existingOffice) {
-      console.warn('[AuthService] Signup Failed - Office ID exists');
-      return { success: false, message: 'Office ID already exists!' };
-    }
+        const officeExists = users.find(u => u.officeId === officeId);
+        if (officeExists) {
+          return of({ success: false, message: 'Office ID already exists!' });
+        }
 
-    // Create new user
-    const newUser: User = {
-      id: crypto.randomUUID(),
-      name,
-      email,
-      password,
-      officeId
-    };
+        const newUser: User = {
+          id: crypto.randomUUID(),
+          name,
+          email,
+          password,
+          officeId
+        };
 
-    users.push(newUser);
-    this.saveUsers(users);
+        return this.http.post<User>(this.apiUrl, newUser).pipe(
+          map(() => ({
+            success: true,
+            message: 'Signup successful!'
+          }))
+        );
+      }),
 
-    console.log('[AuthService] Signup Successful:', newUser);
-
-    return { success: true, message: 'Signup successful!' };
+      catchError(() =>
+        of({ success: false, message: 'Server error. Please try again.' })
+      )
+    );
   }
-
-  //signin
 
   signin(
     identifier: string,
-    password: string
-  ): { success: boolean; message: string } {
+    password: string,
+  ): Observable<{ success: boolean; message: string }> {
 
-    console.log('[AuthService] Signin Attempt:', identifier);
+    return this.http.get<User[]>(this.apiUrl).pipe(
 
-    const users = this.getUsers();
+      map(users => {
 
-    // Normalize identifier (trim spaces)
-    identifier = identifier.trim();
+        const user = users.find(u =>
+          (u.email === identifier || u.officeId === identifier) &&
+          u.password === password
+        );
 
-    const user = users.find(u =>
-      (u.email === identifier || u.officeId === identifier) &&
-      u.password === password
+        if (!user) {
+          return {
+            success: false,
+            message: 'Invalid Office ID / Email or Password!'
+          };
+        }
+
+        // JSON Server doesn't handle sessions
+        localStorage.setItem(this.currentUserKey, JSON.stringify(user));
+
+        return {
+          success: true,
+          message: 'Login successful!'
+        };
+      }),
+
+      catchError(() =>
+        of({
+          success: false,
+          message: 'Server error. Please try again.'
+        })
+      )
+
     );
-
-    if (!user) {
-      console.warn('[AuthService] Signin Failed - Invalid credentials');
-      return { success: false, message: 'Invalid Office ID / Email or Password!' };
-    }
-
-    localStorage.setItem(this.currentUserKey, JSON.stringify(user));
-
-    console.log('[AuthService] Signin Successful:', user);
-
-    return { success: true, message: 'Login successful!' };
   }
 
+  //NO CHANGES IN SESSION MANAGEMENT
   signout() {
     console.log('[AuthService] User Logged Out');
     localStorage.removeItem(this.currentUserKey);

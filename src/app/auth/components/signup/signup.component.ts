@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { catchError, of, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-signup',
@@ -42,6 +43,8 @@ export class SignupComponent {
     this.toastMessage = message;
     this.toastType = type;
     this.showToast = true;
+
+    this.cdr.detectChanges();
 
     setTimeout(() => {
       this.showToast = false;
@@ -89,26 +92,57 @@ export class SignupComponent {
     if (this.isProcessing) return;
     this.isProcessing = true;
 
-    const result = this.authService.signup(
-      this.name,
-      this.email,
-      this.password,
-      this.officeId
-    );
+  //OLD - LOCALSTORAGE VERSION
 
-    if (result.success) {
-      this.showNotification(result.message, 'success');
+  //   const result = this.authService.signup(
+  //     this.name,
+  //     this.email,
+  //     this.password,
+  //     this.officeId
+  //   );
 
-      setTimeout(() => {
-        this.router.navigate(['/board']);
-        this.isProcessing = false;
-      }, 1000);
+  //   if (result.success) {
+  //     this.showNotification(result.message, 'success');
 
-    } else {
-      this.showNotification(result.message, 'info');
-      this.isProcessing = false;
-    }
+  //     setTimeout(() => {
+  //       this.router.navigate(['/board']);
+  //       this.isProcessing = false;
+  //     }, 1000);
+
+  //   } else {
+  //     this.showNotification(result.message, 'info');
+  //     this.isProcessing = false;
+  //   }
+  // }
+
+  //NEW - API VERSION
+
+  this.authService.signup(
+  this.name,
+  this.email,
+  this.password,
+  this.officeId
+)
+.subscribe(result => {
+
+  this.isProcessing = false;
+
+  if (!result) return;
+
+  if (result.success) {
+    this.showNotification(result.message, 'success');
+
+    setTimeout(() => {
+      this.router.navigate(['/signin']);
+    }, 1000);
+
+  } else {
+    // 👈 IMPORTANT FIX
+    this.showNotification(result.message, 'info');
   }
+
+});
+}
 
   // ===============================
   // VALIDATION HELPERS
