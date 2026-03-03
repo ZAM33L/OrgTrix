@@ -55,38 +55,101 @@ export class BoardComponent {
     this.loadBoard();
   }
 
+  // ====================================================
+  // NEW PROPERTY (API MODE)
+  // ====================================================
+  boardId!: string;
+
   // =============================
   // LOCAL STORAGE
   // =============================
 
+  // saveBoard() {
+  //   this.boardService.saveBoard(this.columns);
+  //   console.log('Board saved for current user');
+  // }
+
+  //api version
+
   saveBoard() {
-    this.boardService.saveBoard(this.columns);
-    console.log('Board saved for current user');
+
+  if (!this.boardId) {
+
+    this.boardService.createBoard(this.columns)
+      .subscribe(newBoard => {
+        this.boardId = newBoard.id;
+      });
+
+  } else {
+
+    this.boardService.updateBoard(this.boardId, this.columns)
+      .subscribe();
   }
+}
+
+  //localStorage version
+
+  // loadBoard() {
+
+  //   console.log('Loading board from BoardService...');
+
+  //   const savedBoard = this.boardService.getBoard();
+
+  //   if (!savedBoard || savedBoard.length === 0) {
+  //     console.log('No board found for user. Using default columns.');
+  //     return;
+  //   }
+
+  //   // Restore date objects
+  //   savedBoard.forEach(column => {
+  //     column.tasks.forEach(task => {
+  //       if (task.dueDate) {
+  //         task.dueDate = new Date(task.dueDate);
+  //       }
+  //     });
+  //   });
+
+  //   this.columns = savedBoard;
+
+  //   console.log('Board loaded successfully for current user');
+  // }
+
+  // ====================================================
+  // NEW API VERSION
+  // ====================================================
 
   loadBoard() {
 
-    console.log('Loading board from BoardService...');
+    console.log('LOAD BOARD CALLED');
 
-    const savedBoard = this.boardService.getBoard();
+    this.boardService.getBoard().subscribe(board => {
 
-    if (!savedBoard || savedBoard.length === 0) {
-      console.log('No board found for user. Using default columns.');
-      return;
-    }
+      if (board.length > 0) {
 
-    // Restore date objects
-    savedBoard.forEach(column => {
-      column.tasks.forEach(task => {
-        if (task.dueDate) {
-          task.dueDate = new Date(task.dueDate);
-        }
-      });
+        this.boardId = board[0].id;
+        const savedBoard = board[0].columns;
+
+        // Restore dates
+        savedBoard.forEach(column => {
+          column.tasks.forEach(task => {
+            if (task.dueDate) {
+              task.dueDate = new Date(task.dueDate);
+            }
+          });
+        });
+
+        this.columns = savedBoard;
+        this.cdr.detectChanges();
+
+      } else {
+
+        // First-time user → create board
+        this.boardService.createBoard(this.columns)
+          .subscribe(newBoard => {
+            this.boardId = newBoard.id;
+          });
+      }
     });
-
-    this.columns = savedBoard;
-
-    console.log('Board loaded successfully for current user');
   }
 
   // =============================
@@ -654,13 +717,18 @@ export class BoardComponent {
 
   confirmResetBoard() {
 
-    console.log("Resetting board for current user");
-
+    // LOCALSTORAGE VERSION (COMMENTED)
+    /*
     this.boardService.clearBoard();
-
-    this.showResetBoardConfirm = false;
-
     location.reload();
+    */
+
+    // NEW API VERSION
+
+    this.boardService.deleteBoard(this.boardId)
+      .subscribe(() => {
+        location.reload();
+      });
   }
 
   // =============================
@@ -751,41 +819,41 @@ export class BoardComponent {
   // UPDATE COLUMN
   // =============================
 
-updateColumn() {
-  this.attemptedColumnEditSubmit = true;
+  updateColumn() {
+    this.attemptedColumnEditSubmit = true;
 
-  if (!this.editColumnId) return;
+    if (!this.editColumnId) return;
 
-  if (!this.editColumnTitle.trim()) {
-    this.showNotification('Column title cannot be empty', 'info');
-    return;
+    if (!this.editColumnTitle.trim()) {
+      this.showNotification('Column title cannot be empty', 'info');
+      return;
+    }
+
+    const index = this.columns.findIndex(col => col.id === this.editColumnId);
+    if (index === -1) return;
+
+    const updatedColumn: Column = {
+      ...this.columns[index],
+      title: this.editColumnTitle.trim(),
+      color: this.editColumnColor
+    };
+
+    // Remove old column
+    this.columns.splice(index, 1);
+
+    let newPosition = this.editColumnPosition;
+
+    // 🔥 IMPORTANT FIX
+    if (index < this.editColumnPosition) {
+      newPosition--;
+    }
+
+    this.columns.splice(newPosition, 0, updatedColumn);
+
+    this.saveBoard();
+    this.closeEditColumnModal();
+    this.showNotification(`Column "${updatedColumn.title}" updated`, 'info');
   }
-
-  const index = this.columns.findIndex(col => col.id === this.editColumnId);
-  if (index === -1) return;
-
-  const updatedColumn: Column = {
-    ...this.columns[index],
-    title: this.editColumnTitle.trim(),
-    color: this.editColumnColor
-  };
-
-  // Remove old column
-  this.columns.splice(index, 1);
-
-  let newPosition = this.editColumnPosition;
-
-  // 🔥 IMPORTANT FIX
-  if (index < this.editColumnPosition) {
-    newPosition--;
-  }
-
-  this.columns.splice(newPosition, 0, updatedColumn);
-
-  this.saveBoard();
-  this.closeEditColumnModal();
-  this.showNotification(`Column "${updatedColumn.title}" updated`, 'info');
-}
 
 
   // =============================

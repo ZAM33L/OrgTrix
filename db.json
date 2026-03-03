@@ -1,11 +1,65 @@
 {
   "users": [
     {
-      "id": "02917f00-9fce-46f9-b2f6-b34d3d5dc90f",
+      "id": "e116ac73-52e5-4bdf-91fa-ccde1e935fe9",
       "name": "Jameel",
       "email": "jameelasfer@gmail.com",
       "password": "12345678",
       "officeId": "OT201210"
+    }
+  ],
+  "boards": [
+    {
+      "id": "9c09",
+      "userId": "e116ac73-52e5-4bdf-91fa-ccde1e935fe9",
+      "columns": [
+        {
+          "id": "todo",
+          "title": "To Do",
+          "color": "red",
+          "tasks": [
+            {
+              "id": 1772526435338,
+              "title": "day 1",
+              "description": "do work",
+              "priority": "Medium",
+              "dueDate": "2026-03-30T18:30:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "progress",
+          "title": "In Progress",
+          "color": "yellow",
+          "tasks": []
+        },
+        {
+          "id": "col-1772526449439",
+          "title": "In Testing",
+          "color": "pink",
+          "tasks": [
+            {
+              "id": 1772527190881,
+              "title": "day 2",
+              "description": "do work",
+              "priority": "Medium",
+              "dueDate": "2026-03-19T18:30:00.000Z"
+            }
+          ]
+        },
+        {
+          "id": "completed",
+          "title": "Completed",
+          "color": "green",
+          "tasks": []
+        },
+        {
+          "id": "delivered",
+          "title": "Delivered",
+          "color": "blue",
+          "tasks": []
+        }
+      ]
     }
   ]
 }
