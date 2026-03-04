@@ -212,4 +212,39 @@ export class AuthService {
     return user;
   }
 
+  //update profile
+  updateProfile(updatedUser: User) {
+    return this.http.get<User[]>(this.apiUrl).pipe(
+      switchMap(users => {
+
+        if (users.find(u => u.email === updatedUser.email && u.id !== updatedUser.id)) {
+          return of({ success: false, message: 'Email already registered' });
+        }
+
+        if (users.find(u => u.officeId === updatedUser.officeId && u.id !== updatedUser.id)) {
+          return of({ success: false, message: 'Office ID already registered' });
+        }
+
+        return this.http.put<User>(
+          `${this.apiUrl}/${updatedUser.id}`,
+          updatedUser
+        ).pipe(
+          map(() => {
+            localStorage.setItem(this.currentUserKey, JSON.stringify(updatedUser));
+            return { success: true, message: 'Profile updated successfully' };
+          })
+        );
+      })
+    );
+  }
+  
+  //delete profile
+  deleteProfile(userId: string) {
+    return this.http.delete(`${this.apiUrl}/${userId}`).pipe(
+      map(() => {
+        localStorage.removeItem(this.currentUserKey);
+        return { success: true, message: 'Profile deleted successfully' };
+      })
+    );
+  }
 }

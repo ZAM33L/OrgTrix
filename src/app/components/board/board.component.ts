@@ -73,19 +73,19 @@ export class BoardComponent {
 
   saveBoard() {
 
-  if (!this.boardId) {
+    if (!this.boardId) {
 
-    this.boardService.createBoard(this.columns)
-      .subscribe(newBoard => {
-        this.boardId = newBoard.id;
-      });
+      this.boardService.createBoard(this.columns)
+        .subscribe(newBoard => {
+          this.boardId = newBoard.id;
+        });
 
-  } else {
+    } else {
 
-    this.boardService.updateBoard(this.boardId, this.columns)
-      .subscribe();
+      this.boardService.updateBoard(this.boardId, this.columns)
+        .subscribe();
+    }
   }
-}
 
   //localStorage version
 
@@ -906,7 +906,7 @@ export class BoardComponent {
 
     setTimeout(() => {
       this.showToast = false;
-      this.cdr.detectChanges(); // 👈 force UI update
+      this.cdr.detectChanges(); //force UI update
     }, 3000);
   }
 
@@ -937,6 +937,215 @@ export class BoardComponent {
   //ham menu
   closeToolbarMenu() {
     this.isToolbarMenuOpen = false;
+  }
+
+  //edit profile
+  showEditProfileModal = false;
+
+  name = '';
+  email = '';
+  password = '';
+  confirmPassword = '';
+  officeId = '';
+
+  attemptedProfileSubmit = false;
+  isProcessing = false;
+
+  openEditProfile() {
+    const user = this.authService.getCurrentUser();
+
+    if (!user) {
+      console.log('No user found');
+      return;
+    }
+
+    this.name = user.name;
+    this.email = user.email;
+    this.officeId = user.officeId;
+    this.password = '';
+    this.confirmPassword = '';
+
+    this.showEditProfileModal = true;
+  }
+
+  closeEditProfile() {
+    this.showEditProfileModal = false;
+    this.attemptedProfileSubmit = false;
+  }
+
+  isValidEmail(): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(this.email);
+  }
+
+  isValidPassword(): boolean {
+    return this.password.length >= 8;
+  }
+
+  passwordsMatch(): boolean {
+    return this.password === this.confirmPassword;
+  }
+
+  isValidOfficeId(): boolean {
+    const officeRegex = /^OT\d{6}$/;
+    return officeRegex.test(this.officeId);
+  }
+
+  updateProfile() {
+    this.attemptedProfileSubmit = true;
+
+    this.name = this.name.trim();
+    this.email = this.email.trim();
+    this.officeId = this.officeId.trim().toUpperCase();
+
+    if (!this.name || !this.email || !this.officeId) return;
+
+    if (!this.isValidEmail()) return;
+
+    if (this.password && !this.isValidPassword()) return;
+
+    if (this.password && !this.passwordsMatch()) return;
+
+    if (!this.isValidOfficeId()) return;
+
+    const currentUser = this.authService.getCurrentUser();
+
+    if (!currentUser) {
+      this.showNotification('User not found. Please login again.', 'info');
+      return;
+    }
+
+    // Prevent using current password again
+    if (this.password && this.password === currentUser.password) {
+      this.showNotification('New password cannot be same as current password', 'info');
+      return;
+    }
+
+    // Prevent using previous password
+    if (
+      this.password &&
+      currentUser.passwordHistory &&
+      currentUser.passwordHistory.includes(this.password)
+    ) {
+      this.showNotification('You cannot reuse your previous password', 'info');
+      return;
+    }
+
+    const updatedUser = {
+      ...currentUser,
+      name: this.name,
+      email: this.email,
+      officeId: this.officeId,
+      password: this.password ? this.password : currentUser.password,
+      passwordHistory: this.password ? [currentUser.password] : currentUser.passwordHistory
+    }
+
+    this.isProcessing = true;
+
+    this.authService.updateProfile(updatedUser)
+      .subscribe({
+        next: (result) => {
+          this.isProcessing = false;
+
+          console.log('Service result:', result);
+
+          if (result && result.success === true) {
+            this.showNotification(result.message, 'success');
+            this.showEditProfileModal = false;
+          } else {
+            this.showNotification(result?.message || 'Update failed', 'info');
+          }
+        },
+        error: (err) => {
+          this.isProcessing = false;
+          console.error('Update error:', err);
+          this.showNotification('Something went wrong', 'info');
+        }
+      });
+  }
+  // ===============================
+  // DELETE PROFILE FLOW
+  // ===============================
+
+  // Modal state variables
+  showDeleteProfileConfirm = false;
+  showPasswordConfirm = false;
+  deletePassword = '';
+  attemptedDeleteProfile = false;
+
+  // Open the initial delete confirmation modal
+  openDeleteProfileConfirm() {
+    this.showDeleteProfileConfirm = true;
+  }
+
+  // Close the initial delete confirmation modal
+  closeDeleteProfileConfirm() {
+    this.showDeleteProfileConfirm = false;
+  }
+
+  // Proceed to password confirmation modal
+  proceedToPasswordConfirm() {
+    this.showDeleteProfileConfirm = false; // close delete modal
+    this.showPasswordConfirm = true;
+    this.deletePassword = '';
+    this.attemptedDeleteProfile = false;
+  }
+
+  // Close the password confirmation modal
+  closePasswordConfirm() {
+    this.showPasswordConfirm = false;
+    this.deletePassword = '';
+    this.attemptedDeleteProfile = false;
+  }
+
+  // ===============================
+  // CONFIRM DELETE WITH PASSWORD
+  // ===============================
+  confirmDeleteWithPassword() {
+    this.attemptedDeleteProfile = true;
+
+    if (!this.deletePassword) return;
+
+    const currentUser = this.authService.getCurrentUser();
+
+    if (!currentUser) {
+      this.showNotification('User not found. Please login again.', 'info');
+      return;
+    }
+
+    // Verify password
+    if (this.deletePassword !== currentUser.password) {
+      this.showNotification('Incorrect password. Deletion cancelled.', 'info');
+      return;
+    }
+
+    // Step 1️⃣: Delete all boards of this user
+    this.boardService.deleteBoardsByUser(currentUser.id).subscribe({
+      next: () => {
+        console.log('All boards deleted for user:', currentUser.id);
+
+        // Step 2️⃣: Delete the user
+        this.authService.deleteProfile(currentUser.id).subscribe({
+          next: (result) => {
+            if (result.success) {
+              this.showPasswordConfirm = false;
+              this.showNotification('Your profile and all boards have been deleted.', 'success');
+              this.router.navigate(['/signin']);
+            } else {
+              this.showNotification(result?.message || 'Profile deletion failed', 'info');
+            }
+          },
+          error: (err) => {
+            console.error('Error deleting profile:', err);
+            this.showNotification('Failed to delete profile', 'info');
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error deleting boards:', err);
+        this.showNotification('Failed to delete user boards', 'info');
+      }
+    });
   }
 }
 

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Column } from '../models/column.model';
-import { AuthService } from '../auth/services/auth.service';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { AuthService } from '../auth/services/auth.service';
+import { Column } from '../models/column.model';
 import { Board } from '../models/board.model';
 
 @Injectable({
@@ -10,95 +11,85 @@ import { Board } from '../models/board.model';
 })
 export class BoardService {
 
-  //LOCALSTORAGE VERSION
-
-  // private boardsKey = 'orgtrix_boards';
-
-  // constructor(private authService: AuthService) {}
-
-  // // Get all boards object from localStorage
-  // private getAllBoards(): { [userId: string]: Column[] } {
-  //   return JSON.parse(localStorage.getItem(this.boardsKey) || '{}');
-  // }
-
-  // // Save all boards back
-  // private saveAllBoards(boards: { [userId: string]: Column[] }) {
-  //   localStorage.setItem(this.boardsKey, JSON.stringify(boards));
-  // }
-
-  // // Get current user's board
-  // getBoard(): Column[] {
-  //   const currentUser = this.authService.getCurrentUser();
-  //   if (!currentUser) return [];
-
-  //   const boards = this.getAllBoards();
-
-  //   return boards[currentUser.id] || [];
-  // }
-
-  // // Save current user's board
-  // saveBoard(columns: Column[]) {
-  //   const currentUser = this.authService.getCurrentUser();
-  //   if (!currentUser) return;
-
-  //   const boards = this.getAllBoards();
-  //   boards[currentUser.id] = columns;
-
-  //   this.saveAllBoards(boards);
-  // }
-
-  // // Clear board for current user (optional future use)
-  // clearBoard() {
-  //   const currentUser = this.authService.getCurrentUser();
-  //   if (!currentUser) return;
-
-  //   const boards = this.getAllBoards();
-  //   delete boards[currentUser.id];
-
-  //   this.saveAllBoards(boards);
-  // }
-
   private apiUrl = 'http://localhost:3000/boards';
 
   constructor(
-    private authService:AuthService,
-    private http:HttpClient
-  ){};
+    private authService: AuthService,
+    private http: HttpClient
+  ) { }
 
-  //get board of current user
+  // ================================
+  // GET BOARD FOR CURRENT USER
+  // ================================
   getBoard(): Observable<Board[]> {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) throw new Error('No user found');
 
-    return this.http.get<any[]>(
+    return this.http.get<Board[]>(
       `${this.apiUrl}?userId=${currentUser.id}`
     );
   }
-  // Create board 
-  createBoard(columns: Column[]): Observable<any> {
+
+  // ================================
+  // CREATE BOARD
+  // ================================
+  createBoard(columns: Column[]): Observable<Board> {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) throw new Error('No user found');
 
-    return this.http.post(this.apiUrl, {
+    const newBoard = {
       userId: currentUser.id,
       columns: columns
-    });
+    };
+
+    return this.http.post<Board>(this.apiUrl, newBoard);
   }
 
-  // Update board
-  updateBoard(boardId: string, columns: Column[]): Observable<any> {
+  // ================================
+  // UPDATE BOARD
+  // ================================
+  updateBoard(boardId: string, columns: Column[]): Observable<Board> {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) throw new Error('No user found');
 
-    return this.http.put(`${this.apiUrl}/${boardId}`, {
+    const updatedBoard: Board = {
       id: boardId,
       userId: currentUser.id,
       columns: columns
-    });
+    };
+
+    return this.http.put<Board>(
+      `${this.apiUrl}/${boardId}`,
+      updatedBoard
+    );
   }
 
-  // Delete board (reset)
+  // ================================
+  // DELETE SINGLE BOARD
+  // ================================
   deleteBoard(boardId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${boardId}`);
+  }
+
+  // ================================
+  // CASCADE DELETE BOARDS BY USER
+  // ================================
+  deleteBoardsByUser(userId: string): Observable<any> {
+    return this.http.get<Board[]>(
+      `${this.apiUrl}?userId=${userId}`
+    ).pipe(
+      switchMap(boards => {
+
+        if (boards.length === 0) {
+          return of([]);
+        }
+
+        const deleteRequests = boards.map(board =>
+          this.http.delete(`${this.apiUrl}/${board.id}`)
+        );
+
+        return forkJoin(deleteRequests);
+      })
+    );
   }
 }

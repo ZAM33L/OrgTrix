@@ -61,6 +61,14 @@
       </div>
 
       <!-- Always Visible -->
+       <button (click)="openEditProfile(); closeToolbarMenu()">
+        Edit Profile
+      </button>
+
+      <button (click)="openDeleteProfileConfirm(); closeToolbarMenu()">
+        Delete Profile
+      </button>
+      <hr />
       <button (click)="openResetBoardConfirm(); closeToolbarMenu()">
         Reset Board
       </button>
@@ -573,6 +581,143 @@
         Yes, Signout
       </button>
     </div>
+  </div>
+</div>
+}
+
+<!-- edit profile modal -->
+@if (showEditProfileModal) {
+<div class="modal-overlay">
+  <div class="modal auth-modal">
+    <h3>Edit Profile</h3>
+
+    <!-- NAME -->
+    <input type="text"
+           placeholder="Name"
+           [(ngModel)]="name"
+           [class.invalid]="attemptedProfileSubmit && !name" />
+
+    @if (attemptedProfileSubmit && !name) {
+      <div class="error-msg">Name is required</div>
+    }
+
+    <!-- OFFICE ID -->
+    <input type="text"
+           placeholder="Office ID"
+           [(ngModel)]="officeId"
+           [class.invalid]="attemptedProfileSubmit && (!officeId || !isValidOfficeId())" />
+
+    @if (attemptedProfileSubmit && !officeId) {
+      <div class="error-msg">Office ID is required</div>
+    }
+
+    @if (attemptedProfileSubmit && officeId && !isValidOfficeId()) {
+      <div class="error-msg">Office ID must be like OT123456</div>
+    }
+
+    <!-- EMAIL -->
+    <input type="email"
+           placeholder="Email"
+           [(ngModel)]="email"
+           [class.invalid]="attemptedProfileSubmit && (!email || !isValidEmail())" />
+
+    @if (attemptedProfileSubmit && !email) {
+      <div class="error-msg">Email is required</div>
+    }
+
+    @if (attemptedProfileSubmit && email && !isValidEmail()) {
+      <div class="error-msg">Invalid email format</div>
+    }
+
+    <!-- PASSWORD -->
+    <input type="password"
+           placeholder="New Password (optional)"
+           [(ngModel)]="password"
+           [class.invalid]="attemptedProfileSubmit && password && !isValidPassword()" />
+
+    @if (attemptedProfileSubmit && password && !isValidPassword()) {
+      <div class="error-msg">Password must be at least 8 characters</div>
+    }
+
+    <!-- CONFIRM PASSWORD -->
+    <input type="password"
+           placeholder="Confirm Password"
+           [(ngModel)]="confirmPassword"
+           [class.invalid]="attemptedProfileSubmit && password && !passwordsMatch()" />
+
+    @if (attemptedProfileSubmit && password && !passwordsMatch()) {
+      <div class="error-msg">Passwords do not match</div>
+    }
+
+    <div class="modal-actions">
+      <button (click)="closeEditProfile()">Cancel</button>
+      <button (click)="updateProfile()">Save Changes</button>
+    </div>
+
+  </div>
+</div>
+}
+
+<!-- delete profile -->
+ @if (showDeleteProfileConfirm) {
+<div class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="material-icons modal-icon danger-icon">
+        delete_forever
+      </span>
+      <h3>Delete Profile</h3>
+    </div>
+    <p>Are you sure you want to permanently delete your account?</p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeDeleteProfileConfirm()">
+        Cancel
+      </button>
+
+      <button class="danger-btn" (click)="proceedToPasswordConfirm()">
+        Yes, Delete
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- deletion confirmation using password-->
+@if (showPasswordConfirm) {
+<div class="modal-overlay">
+  <div class="modal auth-modal">
+        <div class="modal-header">
+      <span class="material-icons modal-icon danger-icon">
+        lock
+      </span>
+      <h3>Confirm Deletion</h3>
+    </div>
+
+    <p>Please enter your password to permanently delete your account.</p>
+
+    <input
+      type="password"
+      placeholder="Enter Password"
+      [(ngModel)]="deletePassword"
+      name="deletePassword"
+      [class.invalid]="attemptedDeleteProfile && !deletePassword"
+    />
+
+    @if(attemptedDeleteProfile && !deletePassword){
+      <div class="error-msg">Password is required</div>
+    }
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closePasswordConfirm()">
+        Cancel
+      </button>
+
+      <button class="danger-btn" (click)="confirmDeleteWithPassword()">
+        Confirm Delete
+      </button>
+    </div>
+
   </div>
 </div>
 }
