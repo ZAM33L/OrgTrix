@@ -650,9 +650,14 @@
     }
 
     <div class="modal-actions">
-      <button (click)="closeEditProfile()">Cancel</button>
-      <button (click)="updateProfile()">Save Changes</button>
-    </div>
+  <button (click)="closeEditProfile()" [disabled]="isProcessing">
+    Cancel
+  </button>
+
+  <button (click)="updateProfile()" [disabled]="isProcessing">
+    {{ isProcessing ? 'Saving...' : 'Save Changes' }}
+  </button>
+</div>
 
   </div>
 </div>

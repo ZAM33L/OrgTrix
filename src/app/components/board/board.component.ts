@@ -992,6 +992,7 @@ export class BoardComponent {
   }
 
   updateProfile() {
+
     this.attemptedProfileSubmit = true;
 
     this.name = this.name.trim();
@@ -1037,31 +1038,44 @@ export class BoardComponent {
       email: this.email,
       officeId: this.officeId,
       password: this.password ? this.password : currentUser.password,
-      passwordHistory: this.password ? [currentUser.password] : currentUser.passwordHistory
-    }
+      passwordHistory: this.password
+        ? [currentUser.password, ...(currentUser.passwordHistory || [])]
+        : currentUser.passwordHistory
+    };
 
     this.isProcessing = true;
 
-    this.authService.updateProfile(updatedUser)
-      .subscribe({
-        next: (result) => {
-          this.isProcessing = false;
+    this.authService.updateProfile(updatedUser).subscribe({
 
-          console.log('Service result:', result);
+      next: (result) => {
 
-          if (result && result.success === true) {
-            this.showNotification(result.message, 'success');
-            this.showEditProfileModal = false;
-          } else {
-            this.showNotification(result?.message || 'Update failed', 'info');
-          }
-        },
-        error: (err) => {
-          this.isProcessing = false;
-          console.error('Update error:', err);
-          this.showNotification('Something went wrong', 'info');
+        this.isProcessing = false;
+
+        if (result?.success) {
+
+          // refresh current user from service
+          this.currentUser = this.authService.getCurrentUser();
+
+          this.showNotification('Profile updated successfully', 'success');
+
+          this.closeEditProfile();
+
+          this.cdr.detectChanges();
+
+        } else {
+          this.showNotification(result?.message || 'Update failed', 'info');
         }
-      });
+      },
+
+      error: () => {
+
+        this.isProcessing = false;
+
+        this.showNotification('Something went wrong', 'info');
+      }
+
+    });
+
   }
   // ===============================
   // DELETE PROFILE FLOW

@@ -165,6 +165,41 @@ export class ColumnComponent {
     return this.tasks.filter(task => task.priority === 'Low').length;
   }
 
+  // =========================
+  // PRIORITY FILTER STATE
+  // =========================
+
+  // ADDED: store selected priority filter
+  selectedPriority: 'High' | 'Medium' | 'Low' | null = null;
+
+
+  // ADDED: filter handler when dropdown item clicked
+  filterByPriority(priority: 'High' | 'Medium' | 'Low') {
+    this.selectedPriority = priority;
+    this.closePriorityDropdown();
+  }
+
+
+  // ADDED: clear filter and show all tasks
+  clearPriorityFilter() {
+    this.selectedPriority = null;
+    this.closePriorityDropdown();
+  }
+
+
+  // ADDED: filtered tasks getter
+  get filteredTasks(): Task[] {
+
+    // if no filter applied
+    if (!this.selectedPriority) {
+      return this.tasks;
+    }
+
+    // return filtered tasks
+    return this.tasks.filter(
+      task => task.priority === this.selectedPriority
+    );
+  }
 
 
 }

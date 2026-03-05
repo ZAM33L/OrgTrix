@@ -7,18 +7,30 @@
       <!-- TRIGGER -->
       <span class="task-count-badge" cdkOverlayOrigin #priorityTrigger="cdkOverlayOrigin"
         (click)="openPriorityDropdown()">
-        {{ tasks.length }} {{ tasks.length === 1 ? 'Task' : 'Tasks' }}
+        <!-- CHANGE THIS LINE -->
+
+        {{ selectedPriority
+        ? filteredTasks.length + ' ' + selectedPriority + (filteredTasks.length === 1 ? ' Task' : ' Tasks')
+        : tasks.length + (tasks.length === 1 ? ' Task' : ' Tasks')
+        }}
       </span>
 
       <!-- OVERLAY -->
       <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="priorityTrigger"
         [cdkConnectedOverlayOpen]="isPriorityDropdownOpen" [cdkConnectedOverlayHasBackdrop]="true"
-        (backdropClick)="closePriorityDropdown()"
-        [cdkConnectedOverlayBackdropClass]="'priority-backdrop'">
+        (backdropClick)="closePriorityDropdown()" [cdkConnectedOverlayBackdropClass]="'priority-backdrop'">
 
         <div class="dropdown-panel priority-dropdown">
 
-          <div class="priority-row high">
+          <!-- reset filter -->
+          <div class="priority-row" (click)="clearPriorityFilter()">
+            <div class="left">
+              <span>All Tasks</span>
+            </div>
+            <div class="count">{{ tasks.length }}</div>
+          </div>
+
+          <div class="priority-row high" (click)="filterByPriority('High')">
             <div class="left">
               <span class="dot red-dot"></span>
               <span>High</span>
@@ -26,7 +38,7 @@
             <div class="count">{{ highCount }}</div>
           </div>
 
-          <div class="priority-row medium">
+          <div class="priority-row medium" (click)="filterByPriority('Medium')">
             <div class="left">
               <span class="dot yellow-dot"></span>
               <span>Medium</span>
@@ -34,7 +46,7 @@
             <div class="count">{{ mediumCount }}</div>
           </div>
 
-          <div class="priority-row low">
+          <div class="priority-row low" (click)="filterByPriority('Low')">
             <div class="left">
               <span class="dot green-dot"></span>
               <span>Low</span>
@@ -104,8 +116,8 @@
   </div>
 
   <!-- TASK LIST -->
-  <div cdkDropList [id]="columnId" [cdkDropListData]="tasks" [cdkDropListConnectedTo]="connectedTo" class="task-list"
-    (cdkDropListDropped)="drop($event)">
+  <div cdkDropList [id]="columnId" [cdkDropListData]="filteredTasks" [cdkDropListConnectedTo]="connectedTo"
+    class="task-list" (cdkDropListDropped)="drop($event)">
     @if(tasks.length === 0){
     <div class="empty-placeholder">
       <p>No tasks at the moment .
@@ -113,7 +125,7 @@
       </p>
     </div>
     }
-    @for (task of tasks; track task.id) {
+    @for (task of filteredTasks; track task.id) {
     <div cdkDrag>
       <app-task [task]="task" (edit)="onEdit($event)" (delete)="onDelete($event)">
       </app-task>

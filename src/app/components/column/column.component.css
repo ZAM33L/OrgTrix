@@ -239,6 +239,7 @@
   font-weight: 600;
   min-width: 24px;
   text-align: center;
+  cursor: pointer;
 }
 
 /* =============================== */
