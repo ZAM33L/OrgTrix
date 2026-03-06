@@ -10,43 +10,14 @@
   ],
   "boards": [
     {
-      "id": "ba41",
+      "id": "c612",
       "userId": "1e2d6b67-a2aa-4506-8354-568cda2152ac",
       "columns": [
         {
           "id": "todo",
           "title": "To Do",
           "color": "red",
-          "tasks": [
-            {
-              "id": 1772695230503,
-              "title": "day 1",
-              "description": "do work today",
-              "priority": "Medium",
-              "dueDate": "2026-03-24T18:30:00.000Z"
-            },
-            {
-              "id": 1772695443227,
-              "title": "day 2",
-              "description": "do work",
-              "priority": "Medium",
-              "dueDate": "2026-03-25T18:30:00.000Z"
-            },
-            {
-              "id": 1772695462461,
-              "title": "day 3",
-              "description": "do work",
-              "priority": "Low",
-              "dueDate": "2026-03-30T18:30:00.000Z"
-            },
-            {
-              "id": 1772695474959,
-              "title": "day 4",
-              "description": "do work",
-              "priority": "High",
-              "dueDate": "2026-03-26T18:30:00.000Z"
-            }
-          ]
+          "tasks": []
         },
         {
           "id": "progress",

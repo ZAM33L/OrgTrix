@@ -11,11 +11,18 @@
 
   <p>{{ task.description }}</p>
 
+  @if (task.enteredDate) {
+  <div class="entered-date">
+    ⏱ {{ task.enteredDate | date:'mediumDate' }}
+  </div>
+  }
+
   @if (task.dueDate) {
   <div class="due-date">
     📅 {{ task.dueDate | date:'mediumDate' }}
   </div>
   }
+
 
   <span [ngClass]="task.priority.toLowerCase()">
     {{ task.priority }}

@@ -535,7 +535,7 @@ input[type="date"] {
 
 /* Optional subtle header accent */
 .modal h3 {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   font-size: 20px;
   font-weight: 600;
   color: #2c3e50;
@@ -690,7 +690,11 @@ input[type="date"] {
   }
 
   .board-toolbar {
-    justify-content: flex-end;
+    justify-content: space-between; 
+  }
+
+  .sprint-progress {
+    margin-left: 0;
   }
 
 }
@@ -739,4 +743,46 @@ input[type="date"] {
   .username {
     display: none;
   }
+}
+
+/* sprint progress */
+.sprint-progress{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-left:20px;
+}
+
+.progress-bar{
+  width:120px;
+  height:8px;
+  background:#e5e7eb;
+  border-radius:4px;
+  overflow:hidden;
+}
+
+.progress-fill{
+  height:100%;
+  background:#22c55e;
+  transition:width 0.3s ease;
+}
+
+@media (max-width:768px){
+
+  .sprint-progress span:first-child{
+    display:none; /* hide text */
+  }
+
+  .progress-bar{
+    width:80px;
+  }
+
+}
+
+.field-heading{
+  font-size:14px;
+  font-weight:600;
+  margin-top:16px;
+  margin-bottom:6px;
+  color:#444;
 }

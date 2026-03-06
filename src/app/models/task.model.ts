@@ -4,4 +4,5 @@ export interface Task {
     description:string;
     priority: 'High' | 'Medium' | 'Low';
     dueDate:Date | null;
+    enteredDate:Date | null;
 }

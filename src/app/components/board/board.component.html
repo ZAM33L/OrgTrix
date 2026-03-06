@@ -37,6 +37,21 @@
     </button>
   </div>
 
+  <!-- sprint progress-->
+  <div class="sprint-progress">
+    <span class="sprint-label">Sprint Progress</span> 
+    <div class="progress-bar"> 
+      <div 
+      class="progress-fill" 
+      [style.width.%]="sprintProgressPercent"
+      > 
+      </div>
+     </div> 
+     <span class="progress-text"> 
+      {{ sprintProgressPercent }}% 
+    </span>
+  </div>
+
   <!-- RIGHT SIDE MENU -->
   <div class="toolbar-menu">
 
@@ -61,7 +76,7 @@
       </div>
 
       <!-- Always Visible -->
-       <button (click)="openEditProfile(); closeToolbarMenu()">
+      <button (click)="openEditProfile(); closeToolbarMenu()">
         Edit Profile
       </button>
 
@@ -100,7 +115,7 @@
 </div>
 
 
-<!-- ADD MODAL -->
+<!-- ADD TASK MODAL -->
 @if (showAddModal) {
 <div class="modal-backdrop">
   <div class="modal">
@@ -114,7 +129,8 @@
     </div>
     }
     <textarea placeholder="Description" [(ngModel)]="newTask.description"></textarea>
-
+    <!--priority-->
+    <h4 class="field-heading">Priority</h4>
     <div class="cdk-select" cdkOverlayOrigin #addTrigger="cdkOverlayOrigin" (click)="toggleAddDropdown()">
 
       {{ newTask.priority || 'Select Priority' }}
@@ -142,7 +158,8 @@
       </div>
 
     </ng-template>
-
+    <!-- due date -->
+     <h4 class="field-heading">Due Date</h4>
     <div class="cdk-select" cdkOverlayOrigin #addDateTrigger="cdkOverlayOrigin" (click)="toggleAddDate()"
       [class.invalid]="!newTask.dueDate && attemptedSubmit">
 
@@ -194,7 +211,54 @@
 
     </ng-template>
 
+    <!-- ENTERED DATE -->
+    <h4 class="field-heading">Entered Date</h4>
+    <div class="cdk-select" cdkOverlayOrigin #addEnteredDateTrigger="cdkOverlayOrigin" (click)="toggleAddEnteredDate()">
 
+      {{ newTask.enteredDate ? (newTask.enteredDate | date:'mediumDate') : 'Select Entered Date' }}
+
+    </div>
+
+
+    <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="addEnteredDateTrigger"
+      [cdkConnectedOverlayOpen]="isAddEnteredDateOpen" [cdkConnectedOverlayHasBackdrop]="true"
+      [cdkConnectedOverlayPositions]="dateOverlayPositions" (backdropClick)="closeAddEnteredDate()">
+
+      <div class="date-panel">
+
+        <!-- Calendar Header -->
+        <div class="calendar-header">
+
+          <div class="year-controls">
+            <button (click)="previousYear()">«</button>
+            <button (click)="previousMonth()">‹</button>
+          </div>
+
+          <span class="month-label">
+            {{ currentMonth | date:'MMMM yyyy' }}
+          </span>
+
+          <div class="year-controls">
+            <button (click)="nextMonth()">›</button>
+            <button (click)="nextYear()">»</button>
+          </div>
+
+        </div>
+
+
+        <!-- Days Grid -->
+        <div class="date-cell" *ngFor="let day of getDaysInMonth()" [class.selected]="newTask.enteredDate &&
+        newTask.enteredDate.getDate() === day.getDate() &&
+        newTask.enteredDate.getMonth() === day.getMonth() &&
+        newTask.enteredDate.getFullYear() === day.getFullYear()" (click)="selectAddEnteredDate(day)">
+
+          {{ day.getDate() }}
+
+        </div>
+
+      </div>
+
+    </ng-template>
     <div class="modal-actions">
       <button (click)="addTask()">Add</button>
       <button (click)="closeAddModal()">Cancel</button>
@@ -204,7 +268,7 @@
 }
 
 
-<!-- EDIT MODAL -->
+<!-- EDIT TASK MODAL -->
 @if (showEditModal && editingTask) {
 <div class="modal-backdrop">
   <div class="modal">
@@ -218,7 +282,8 @@
     </div>
     }
     <textarea [(ngModel)]="editingTask.description"></textarea>
-
+    <!-- priority -->
+     <h4 class="field-heading">Priority</h4>
     <div class="cdk-select" cdkOverlayOrigin #editTrigger="cdkOverlayOrigin" (click)="toggleEditDropdown()"> {{
       editingTask.priority || 'Select Priority' }} </div> <ng-template cdk-connected-overlay
       [cdkConnectedOverlayOrigin]="editTrigger" [cdkConnectedOverlayOpen]="isEditDropdownOpen"
@@ -242,7 +307,8 @@
       </div>
 
     </ng-template>
-
+    <!-- due date-->
+     <h4 class="field-heading">Due Date</h4>
     <div class="cdk-select" cdkOverlayOrigin #editDateTrigger="cdkOverlayOrigin" (click)="toggleEditDate()">
 
       {{ editingTask.dueDate ? (editingTask.dueDate | date:'mediumDate') : 'Select Due Date' }}
@@ -281,6 +347,53 @@
           [class.past]="isPastDate(day)">
 
           {{ day.getDate() }}
+        </div>
+
+      </div>
+
+    </ng-template>
+
+    <!-- EDIT ENTERED DATE -->
+     <h4 class="field-heading">Entered Date</h4>
+    <div class="cdk-select" cdkOverlayOrigin #editEnteredTrigger="cdkOverlayOrigin" (click)="toggleEditEnteredDate()">
+
+      {{ editingTask.enteredDate ? (editingTask.enteredDate | date:'mediumDate') : 'Select Entered Date' }}
+
+    </div>
+
+    <ng-template cdk-connected-overlay [cdkConnectedOverlayOrigin]="editEnteredTrigger"
+      [cdkConnectedOverlayOpen]="isEditEnteredDateOpen" [cdkConnectedOverlayHasBackdrop]="true"
+      [cdkConnectedOverlayPositions]="dateOverlayPositions" (backdropClick)="closeEditEnteredDate()">
+
+      <div class="date-panel">
+
+        <!-- Calendar Header -->
+        <div class="calendar-header">
+
+          <div class="year-controls">
+            <button (click)="previousYear()">«</button>
+            <button (click)="previousMonth()">‹</button>
+          </div>
+
+          <span class="month-label">
+            {{ currentMonth | date:'MMMM yyyy' }}
+          </span>
+
+          <div class="year-controls">
+            <button (click)="nextMonth()">›</button>
+            <button (click)="nextYear()">»</button>
+          </div>
+
+        </div>
+
+        <!-- Days Grid -->
+        <div class="date-cell" *ngFor="let day of getDaysInMonth()" [class.selected]="editingTask.enteredDate &&
+        editingTask.enteredDate.getDate() === day.getDate() &&
+        editingTask.enteredDate.getMonth() === day.getMonth() &&
+        editingTask.enteredDate.getFullYear() === day.getFullYear()" (click)="selectEditEnteredDate(day)">
+
+          {{ day.getDate() }}
+
         </div>
 
       </div>
@@ -592,79 +705,68 @@
     <h3>Edit Profile</h3>
 
     <!-- NAME -->
-    <input type="text"
-           placeholder="Name"
-           [(ngModel)]="name"
-           [class.invalid]="attemptedProfileSubmit && !name" />
+    <input type="text" placeholder="Name" [(ngModel)]="name" [class.invalid]="attemptedProfileSubmit && !name" />
 
     @if (attemptedProfileSubmit && !name) {
-      <div class="error-msg">Name is required</div>
+    <div class="error-msg">Name is required</div>
     }
 
     <!-- OFFICE ID -->
-    <input type="text"
-           placeholder="Office ID"
-           [(ngModel)]="officeId"
-           [class.invalid]="attemptedProfileSubmit && (!officeId || !isValidOfficeId())" />
+    <input type="text" placeholder="Office ID" [(ngModel)]="officeId"
+      [class.invalid]="attemptedProfileSubmit && (!officeId || !isValidOfficeId())" />
 
     @if (attemptedProfileSubmit && !officeId) {
-      <div class="error-msg">Office ID is required</div>
+    <div class="error-msg">Office ID is required</div>
     }
 
     @if (attemptedProfileSubmit && officeId && !isValidOfficeId()) {
-      <div class="error-msg">Office ID must be like OT123456</div>
+    <div class="error-msg">Office ID must be like OT123456</div>
     }
 
     <!-- EMAIL -->
-    <input type="email"
-           placeholder="Email"
-           [(ngModel)]="email"
-           [class.invalid]="attemptedProfileSubmit && (!email || !isValidEmail())" />
+    <input type="email" placeholder="Email" [(ngModel)]="email"
+      [class.invalid]="attemptedProfileSubmit && (!email || !isValidEmail())" />
 
     @if (attemptedProfileSubmit && !email) {
-      <div class="error-msg">Email is required</div>
+    <div class="error-msg">Email is required</div>
     }
 
     @if (attemptedProfileSubmit && email && !isValidEmail()) {
-      <div class="error-msg">Invalid email format</div>
+    <div class="error-msg">Invalid email format</div>
     }
 
     <!-- PASSWORD -->
-    <input type="password"
-           placeholder="New Password (optional)"
-           [(ngModel)]="password"
-           [class.invalid]="attemptedProfileSubmit && password && !isValidPassword()" />
+    <input type="password" placeholder="New Password (optional)" [(ngModel)]="password"
+      [class.invalid]="attemptedProfileSubmit && password && !isValidPassword()" />
 
     @if (attemptedProfileSubmit && password && !isValidPassword()) {
-      <div class="error-msg">Password must be at least 8 characters</div>
+    <div class="error-msg">Password must be at least 8 characters</div>
     }
 
     <!-- CONFIRM PASSWORD -->
-    <input type="password"
-           placeholder="Confirm Password"
-           [(ngModel)]="confirmPassword"
-           [class.invalid]="attemptedProfileSubmit && password && !passwordsMatch()" />
+    <input type="password" placeholder="Confirm Password" [(ngModel)]="confirmPassword"
+      [class.invalid]="attemptedProfileSubmit && password && !passwordsMatch()" />
 
     @if (attemptedProfileSubmit && password && !passwordsMatch()) {
-      <div class="error-msg">Passwords do not match</div>
+    <div class="error-msg">Passwords do not match</div>
     }
 
     <div class="modal-actions">
-  <button (click)="closeEditProfile()" [disabled]="isProcessing">
-    Cancel
-  </button>
+      <button (click)="closeEditProfile()" [disabled]="isProcessing">
+        Cancel
+      </button>
 
-  <button (click)="updateProfile()" [disabled]="isProcessing">
-    {{ isProcessing ? 'Saving...' : 'Save Changes' }}
-  </button>
-</div>
+      <button (click)="updateProfile()" [disabled]="isProcessing">
+        {{ isProcessing ? 'Saving...' : 'Save Changes' }}
+      </button>
+    </div>
 
   </div>
 </div>
 }
 
 <!-- delete profile -->
- @if (showDeleteProfileConfirm) {
+@if (showDeleteProfileConfirm) {
 <div class="modal-overlay">
   <div class="modal-box">
     <div class="modal-header">
@@ -692,7 +794,7 @@
 @if (showPasswordConfirm) {
 <div class="modal-overlay">
   <div class="modal auth-modal">
-        <div class="modal-header">
+    <div class="modal-header">
       <span class="material-icons modal-icon danger-icon">
         lock
       </span>
@@ -701,16 +803,11 @@
 
     <p>Please enter your password to permanently delete your account.</p>
 
-    <input
-      type="password"
-      placeholder="Enter Password"
-      [(ngModel)]="deletePassword"
-      name="deletePassword"
-      [class.invalid]="attemptedDeleteProfile && !deletePassword"
-    />
+    <input type="password" placeholder="Enter Password" [(ngModel)]="deletePassword" name="deletePassword"
+      [class.invalid]="attemptedDeleteProfile && !deletePassword" />
 
     @if(attemptedDeleteProfile && !deletePassword){
-      <div class="error-msg">Password is required</div>
+    <div class="error-msg">Password is required</div>
     }
 
     <div class="modal-actions">

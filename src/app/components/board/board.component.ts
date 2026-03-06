@@ -55,9 +55,6 @@ export class BoardComponent {
     this.loadBoard();
   }
 
-  // ====================================================
-  // NEW PROPERTY (API MODE)
-  // ====================================================
   boardId!: string;
 
   // =============================
@@ -135,10 +132,15 @@ export class BoardComponent {
             if (task.dueDate) {
               task.dueDate = new Date(task.dueDate);
             }
+            if (task.enteredDate) {
+              task.enteredDate = new Date(task.enteredDate);
+            }
           });
         });
 
         this.columns = savedBoard;
+        
+        this.calculateSprintProgress();
         this.cdr.detectChanges();
 
       } else {
@@ -156,10 +158,18 @@ export class BoardComponent {
   // COLUMNS
   // =============================
   columns: Column[] = [
-    { id: 'todo', title: 'To Do', color: 'red', tasks: [] },
-    { id: 'progress', title: 'In Progress', color: 'yellow', tasks: [] },
-    { id: 'completed', title: 'Completed', color: 'green', tasks: [] },
-    { id: 'delivered', title: 'Delivered', color: 'blue', tasks: [] }
+    {
+      id: 'todo', title: 'To Do', color: 'red', tasks: []
+    },
+    {
+      id: 'progress', title: 'In Progress', color: 'yellow', tasks: []
+    },
+    {
+      id: 'completed', title: 'Completed', color: 'green', tasks: []
+    },
+    {
+      id: 'delivered', title: 'Delivered', color: 'blue', tasks: []
+    }
   ];
 
   get connectedColumnIds(): string[] {
@@ -175,6 +185,8 @@ export class BoardComponent {
   showAddModal = false;
   attemptedSubmit = false;
 
+  isAddEnteredDateOpen = false;
+
   newTask: Task = this.createEmptyTask();
 
   openAddModal(columnId: string) {
@@ -187,6 +199,19 @@ export class BoardComponent {
     this.showAddModal = false;
     this.attemptedSubmit = false;
     this.resetNewTask();
+  }
+
+  toggleAddEnteredDate() {
+    this.isAddEnteredDateOpen = !this.isAddEnteredDateOpen;
+  }
+
+  closeAddEnteredDate() {
+    this.isAddEnteredDateOpen = false;
+  }
+
+  selectAddEnteredDate(day: Date) {
+    this.newTask.enteredDate = new Date(day);
+    this.closeAddEnteredDate();
   }
 
   addTask() {
@@ -213,6 +238,7 @@ export class BoardComponent {
     });
 
     this.saveBoard();
+    this.calculateSprintProgress();
     this.closeAddModal();
     this.showNotification('Task added successfully!', 'success');
   }
@@ -223,7 +249,8 @@ export class BoardComponent {
       title: '',
       description: '',
       priority: 'Medium',
-      dueDate: null
+      dueDate: null,
+      enteredDate: new Date()
     };
   }
 
@@ -239,6 +266,9 @@ export class BoardComponent {
   editingTask: Task | null = null;
   attemptedEditSubmit = false;
 
+  isEditEnteredDateOpen = false;
+
+
   openEditModal(task: Task) {
     this.editingTask = { ...task };
     this.showEditModal = true;
@@ -248,6 +278,21 @@ export class BoardComponent {
   closeEditModal() {
     this.showEditModal = false;
     this.editingTask = null;
+  }
+
+  toggleEditEnteredDate() {
+    this.isEditEnteredDateOpen = !this.isEditEnteredDateOpen;
+  }
+
+  closeEditEnteredDate() {
+    this.isEditEnteredDateOpen = false;
+  }
+
+  selectEditEnteredDate(day: Date) {
+    if (!this.editingTask) return;
+
+    this.editingTask.enteredDate = new Date(day);
+    this.closeEditEnteredDate();
   }
 
   updateTask() {
@@ -272,6 +317,7 @@ export class BoardComponent {
       }
     }
     this.saveBoard();
+    this.calculateSprintProgress();
     this.closeEditModal();
     this.showNotification('Task updated successfully!', 'success');
   }
@@ -307,6 +353,7 @@ export class BoardComponent {
       console.log(`Task deleted from column "${column.title}". ID:`, this.taskToDelete.taskId);
     }
     this.saveBoard();
+    this.calculateSprintProgress();
     this.closeTaskDeleteConfirm();
     this.showNotification("Task deleted !", 'success')
   }
@@ -334,6 +381,7 @@ export class BoardComponent {
       console.log(`All tasks cleared in column "${column.title}"`);
     }
     this.saveBoard();
+    this.calculateSprintProgress();
     this.closeDeleteConfirm();
     this.showNotification(` tasks have been removed in Column "${column?.title}".`, 'info');
   }
@@ -345,6 +393,7 @@ export class BoardComponent {
   onTaskMoved() {
     console.log('Drag & drop detected. Board order updated.');
     this.saveBoard();
+    this.calculateSprintProgress();
   }
 
   // =============================
@@ -412,6 +461,12 @@ export class BoardComponent {
       originY: 'bottom',
       overlayX: 'start',
       overlayY: 'top'
+    },
+    {
+      originX: 'start',
+      originY: 'top',
+      overlayX: 'start',
+      overlayY: 'bottom'
     }
   ];
 
@@ -1133,12 +1188,12 @@ export class BoardComponent {
       return;
     }
 
-    // Step 1️⃣: Delete all boards of this user
+    // Step 1: Delete all boards of this user
     this.boardService.deleteBoardsByUser(currentUser.id).subscribe({
       next: () => {
         console.log('All boards deleted for user:', currentUser.id);
 
-        // Step 2️⃣: Delete the user
+        // Step 2: Delete the user
         this.authService.deleteProfile(currentUser.id).subscribe({
           next: (result) => {
             if (result.success) {
@@ -1160,6 +1215,63 @@ export class BoardComponent {
         this.showNotification('Failed to delete user boards', 'info');
       }
     });
+  }
+
+  // sprint progress
+  sprintProgressPercent: number = 0;
+
+  calculateSprintProgress() {
+
+    const today = new Date();
+
+    // 🔹 normalize today
+    today.setHours(0, 0, 0, 0);
+
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+
+    // 🔹 normalize start of week
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    // 🔹 normalize end of week
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    let sprintTasks = [];
+    let completedSprintTasks = [];
+
+    this.columns.forEach(column => {
+
+      column.tasks.forEach(task => {
+
+        if (!task.dueDate) return;
+
+        const due = new Date(task.dueDate);
+
+        if (due >= startOfWeek && due <= endOfWeek) {
+          sprintTasks.push(task);
+
+          const title = column.title.toLowerCase();
+
+          if (title === 'completed' || title === 'delivered') {
+            completedSprintTasks.push(task);
+          }
+        }
+
+      });
+
+    });
+
+    if (sprintTasks.length === 0) {
+      this.sprintProgressPercent = 0;
+      return;
+    }
+
+    this.sprintProgressPercent = Math.round(
+      (completedSprintTasks.length / sprintTasks.length) * 100
+    );
   }
 }
 
