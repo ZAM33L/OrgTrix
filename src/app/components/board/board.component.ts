@@ -111,6 +111,11 @@ export class BoardComponent {
   //   console.log('Board loaded successfully for current user');
   // }
 
+  updateBoardStats() {
+    this.calculateSprintProgress();
+    this.calculateOverdueTasks();
+  }
+
   // ====================================================
   // NEW API VERSION
   // ====================================================
@@ -139,8 +144,8 @@ export class BoardComponent {
         });
 
         this.columns = savedBoard;
-        
-        this.calculateSprintProgress();
+
+        this.updateBoardStats();
         this.cdr.detectChanges();
 
       } else {
@@ -227,18 +232,18 @@ export class BoardComponent {
       console.log('Column not found while adding task');
       return;
     }
-
+    const newTaskId = Date.now() + Math.floor(Math.random() * 1000);
     column.tasks.push({
       ...this.newTask,
-      id: Date.now()
+      id: newTaskId,
     });
     console.log(`Task added to column "${column.title}"`, {
       ...this.newTask,
-      id: Date.now()
+      id: newTaskId
     });
 
     this.saveBoard();
-    this.calculateSprintProgress();
+    this.updateBoardStats();
     this.closeAddModal();
     this.showNotification('Task added successfully!', 'success');
   }
@@ -317,7 +322,7 @@ export class BoardComponent {
       }
     }
     this.saveBoard();
-    this.calculateSprintProgress();
+    this.updateBoardStats();
     this.closeEditModal();
     this.showNotification('Task updated successfully!', 'success');
   }
@@ -353,7 +358,7 @@ export class BoardComponent {
       console.log(`Task deleted from column "${column.title}". ID:`, this.taskToDelete.taskId);
     }
     this.saveBoard();
-    this.calculateSprintProgress();
+    this.updateBoardStats();
     this.closeTaskDeleteConfirm();
     this.showNotification("Task deleted !", 'success')
   }
@@ -381,7 +386,7 @@ export class BoardComponent {
       console.log(`All tasks cleared in column "${column.title}"`);
     }
     this.saveBoard();
-    this.calculateSprintProgress();
+    this.updateBoardStats();
     this.closeDeleteConfirm();
     this.showNotification(` tasks have been removed in Column "${column?.title}".`, 'info');
   }
@@ -393,7 +398,7 @@ export class BoardComponent {
   onTaskMoved() {
     console.log('Drag & drop detected. Board order updated.');
     this.saveBoard();
-    this.calculateSprintProgress();
+    this.updateBoardStats();
   }
 
   // =============================
@@ -1219,28 +1224,30 @@ export class BoardComponent {
 
   // sprint progress
   sprintProgressPercent: number = 0;
+  workingDays: number[] = [1, 2, 3, 4, 5]; // Mon-Fri default
 
   calculateSprintProgress() {
 
     const today = new Date();
-
-    // 🔹 normalize today
     today.setHours(0, 0, 0, 0);
 
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay());
+    const currentDay = today.getDay();
 
-    // 🔹 normalize start of week
-    startOfWeek.setHours(0, 0, 0, 0);
+    const firstWorkDay = this.workingDays[0];
+    const lastWorkDay = this.workingDays[this.workingDays.length - 1];
 
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    // calculate sprint start
+    const startOfSprint = new Date(today);
+    startOfSprint.setDate(today.getDate() - (currentDay - firstWorkDay));
+    startOfSprint.setHours(0, 0, 0, 0);
 
-    // 🔹 normalize end of week
-    endOfWeek.setHours(23, 59, 59, 999);
+    // calculate sprint end
+    const endOfSprint = new Date(startOfSprint);
+    endOfSprint.setDate(startOfSprint.getDate() + (lastWorkDay - firstWorkDay));
+    endOfSprint.setHours(23, 59, 59, 999);
 
-    let sprintTasks = [];
-    let completedSprintTasks = [];
+    let sprintTasks: any[] = [];
+    let completedSprintTasks: any[] = [];
 
     this.columns.forEach(column => {
 
@@ -1250,7 +1257,8 @@ export class BoardComponent {
 
         const due = new Date(task.dueDate);
 
-        if (due >= startOfWeek && due <= endOfWeek) {
+        if (due >= startOfSprint && due <= endOfSprint) {
+
           sprintTasks.push(task);
 
           const title = column.title.toLowerCase();
@@ -1258,6 +1266,7 @@ export class BoardComponent {
           if (title === 'completed' || title === 'delivered') {
             completedSprintTasks.push(task);
           }
+
         }
 
       });
@@ -1272,6 +1281,40 @@ export class BoardComponent {
     this.sprintProgressPercent = Math.round(
       (completedSprintTasks.length / sprintTasks.length) * 100
     );
+
+  }
+
+  //tasks overdue
+  overdueTasksCount: number = 0;
+
+  calculateOverdueTasks() {
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);   // remove time
+
+    let overdue = 0;
+
+    this.columns.forEach(column => {
+
+      column.tasks.forEach(task => {
+
+        if (!task.dueDate) return;
+
+        const due = new Date(task.dueDate);
+        due.setHours(0, 0, 0, 0);  // remove time
+
+        const title = column.title.toLowerCase();
+        const isFinished = title === 'delivered' || title === 'completed';
+
+        if (due < today && !isFinished) {
+          overdue++;
+        }
+
+      });
+
+    });
+
+    this.overdueTasksCount = overdue;
   }
 }
 

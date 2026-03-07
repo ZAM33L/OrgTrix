@@ -786,3 +786,26 @@ input[type="date"] {
   margin-bottom:6px;
   color:#444;
 }
+
+/* tasks overdue */
+.overdue-tasks{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:2px;
+  margin-left:16px;
+}
+
+.overdue-count{
+  font-size:13px;
+  font-weight:500;
+  color:#ef4444;
+}
+
+@media (max-width:768px){
+
+  .overdue-tasks span:first-child{
+    display:none;
+  }
+
+}

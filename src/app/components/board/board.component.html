@@ -39,17 +39,26 @@
 
   <!-- sprint progress-->
   <div class="sprint-progress">
-    <span class="sprint-label">Sprint Progress</span> 
-    <div class="progress-bar"> 
-      <div 
-      class="progress-fill" 
-      [style.width.%]="sprintProgressPercent"
-      > 
+    <span class="sprint-label">Weekly Sprint Progress</span>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="sprintProgressPercent">
       </div>
-     </div> 
-     <span class="progress-text"> 
-      {{ sprintProgressPercent }}% 
+    </div>
+    <span class="progress-text">
+      {{ sprintProgressPercent }}%
     </span>
+  </div>
+
+  <!-- tasks overdue -->
+  <div class="overdue-tasks">
+
+    <span>Overdue Work : </span>
+
+    <span class="overdue-count">
+      ⚠ {{ overdueTasksCount }}
+      {{ overdueTasksCount === 1 ? 'task overdue' : 'tasks overdue' }}
+    </span>
+
   </div>
 
   <!-- RIGHT SIDE MENU -->
@@ -159,7 +168,7 @@
 
     </ng-template>
     <!-- due date -->
-     <h4 class="field-heading">Due Date</h4>
+    <h4 class="field-heading">Due Date</h4>
     <div class="cdk-select" cdkOverlayOrigin #addDateTrigger="cdkOverlayOrigin" (click)="toggleAddDate()"
       [class.invalid]="!newTask.dueDate && attemptedSubmit">
 
@@ -283,7 +292,7 @@
     }
     <textarea [(ngModel)]="editingTask.description"></textarea>
     <!-- priority -->
-     <h4 class="field-heading">Priority</h4>
+    <h4 class="field-heading">Priority</h4>
     <div class="cdk-select" cdkOverlayOrigin #editTrigger="cdkOverlayOrigin" (click)="toggleEditDropdown()"> {{
       editingTask.priority || 'Select Priority' }} </div> <ng-template cdk-connected-overlay
       [cdkConnectedOverlayOrigin]="editTrigger" [cdkConnectedOverlayOpen]="isEditDropdownOpen"
@@ -308,7 +317,7 @@
 
     </ng-template>
     <!-- due date-->
-     <h4 class="field-heading">Due Date</h4>
+    <h4 class="field-heading">Due Date</h4>
     <div class="cdk-select" cdkOverlayOrigin #editDateTrigger="cdkOverlayOrigin" (click)="toggleEditDate()">
 
       {{ editingTask.dueDate ? (editingTask.dueDate | date:'mediumDate') : 'Select Due Date' }}
@@ -354,7 +363,7 @@
     </ng-template>
 
     <!-- EDIT ENTERED DATE -->
-     <h4 class="field-heading">Entered Date</h4>
+    <h4 class="field-heading">Entered Date</h4>
     <div class="cdk-select" cdkOverlayOrigin #editEnteredTrigger="cdkOverlayOrigin" (click)="toggleEditEnteredDate()">
 
       {{ editingTask.enteredDate ? (editingTask.enteredDate | date:'mediumDate') : 'Select Entered Date' }}
