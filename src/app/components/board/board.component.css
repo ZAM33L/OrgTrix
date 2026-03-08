@@ -746,6 +746,11 @@ input[type="date"] {
 }
 
 /* sprint progress */
+.sprint-progress-wrapper{
+  position: relative;
+  display: inline-block;
+}
+
 .sprint-progress{
   display:flex;
   align-items:center;
@@ -754,6 +759,7 @@ input[type="date"] {
 }
 
 .progress-bar{
+  cursor:pointer;
   width:120px;
   height:8px;
   background:#e5e7eb;
@@ -806,6 +812,188 @@ input[type="date"] {
 
   .overdue-tasks span:first-child{
     display:none;
+  }
+
+}
+
+/* ===================================== */
+/* SPRINT SUMMARY POPUP */
+/* ===================================== */
+
+.sprint-summary-popup::before{
+  content:'';
+  position:absolute;
+  top:-6px;
+  right:28px;
+
+  width:12px;
+  height:12px;
+
+  background:white;
+  transform:rotate(45deg);
+}
+
+.sprint-summary-popup{
+  position:absolute;
+  top:70px;
+  right:20px;
+
+  width:260px;
+
+  background:white;
+  border-radius:10px;
+  padding:16px;
+
+  box-shadow:0 8px 25px rgba(0,0,0,0.15);
+
+  z-index:200;
+}
+
+/* HEADER */
+
+.popup-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+
+.popup-title{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:600;
+}
+
+.popup-title .material-icons{
+  font-size:20px;
+}
+
+.popup-close{
+  background:none;
+  border:none;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+}
+
+.popup-close .material-icons{
+  font-size:18px;
+}
+
+/* BODY */
+
+.popup-body{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* SUMMARY ITEMS */
+
+.summary-item{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.summary-item:not(:last-child){
+  padding-bottom:10px;
+  border-bottom:1px solid #f1f5f9;
+}
+
+/* LABEL */
+
+.summary-item .label{
+  font-size:12px;
+  color:#6b7280;
+}
+
+/* VALUES */
+
+.value{
+  display:flex;
+  align-items:center;
+  gap:6px;
+
+  font-size:14px;
+  font-weight:500;
+
+  padding:4px 6px;
+  border-radius:6px;
+
+  transition:background 0.2s;
+}
+
+.value:hover{
+  background:#f8fafc;
+}
+
+.value .material-icons{
+  font-size:18px;
+}
+
+/* ICON COLORS */
+
+.value.total .material-icons{
+  color:#3b82f6;
+}
+
+.value.completed .material-icons{
+  color:#22c55e;
+}
+
+.value.remaining .material-icons{
+  color:#f59e0b;
+}
+
+.value.time .material-icons{
+  color:#6366f1;
+}
+
+/* PROGRESS */
+
+.summary-progress{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.progress-bar.large{
+  width:140px;
+  height:8px;
+
+  background:#e5e7eb;
+  border-radius:4px;
+  overflow:hidden;
+}
+
+.progress-fill{
+  height:100%;
+  background:#3b82f6;
+  border-radius:4px;
+}
+
+.progress-text{
+  font-size:13px;
+  font-weight:600;
+}
+
+@media (max-width: 500px){
+
+  .sprint-summary-popup{
+    position: fixed;       /* key fix */
+    top: 120px;            /* below header + toolbar */
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto;
+
+    width: 220px;
+    max-width: 90vw;
+  }
+
+  .sprint-summary-popup::before{
+    display:none;          /* arrow looks odd when centered */
   }
 
 }

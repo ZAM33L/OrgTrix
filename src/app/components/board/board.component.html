@@ -38,16 +38,98 @@
   </div>
 
   <!-- sprint progress-->
-  <div class="sprint-progress">
-    <span class="sprint-label">Weekly Sprint Progress</span>
-    <div class="progress-bar">
-      <div class="progress-fill" [style.width.%]="sprintProgressPercent">
+
+  <div class="sprint-progress-wrapper">
+    <div class="sprint-progress">
+      <span class="sprint-label">Weekly Sprint Progress</span>
+      <div class="progress-bar clickable" title="View Sprint Summary" (click)="toggleSprintSummary($event)">
+        <div class="progress-fill" [style.width.%]="sprintProgressPercent">
+        </div>
+      </div>
+      <span class="progress-text">
+        {{ sprintProgressPercent }}%
+      </span>
+    </div>
+<!-- SPRINT SUMMARY POPUP -->
+@if (showSprintSummaryModal) {
+<div class="sprint-summary-popup" (click)="$event.stopPropagation()">
+
+  <div class="popup-header">
+    <div class="popup-title">
+      <span class="material-icons">insights</span>
+      <span>Sprint Summary</span>
+    </div>
+
+    <button class="popup-close" (click)="closeSprintSummary()">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+
+  <div class="popup-body">
+
+    <!-- Shift -->
+    <div class="summary-item">
+      <span class="label">Shift</span>
+      <span class="value">
+        {{ sprintShiftLabel }}
+      </span>
+    </div>
+
+    <!-- Sprint Progress -->
+    <div class="summary-item">
+      <span class="label">Sprint Progress</span>
+
+      <div class="summary-progress">
+        <div class="progress-bar large">
+          <div
+            class="progress-fill"
+            [style.width.%]="sprintProgressPercent">
+          </div>
+        </div>
+
+        <span class="progress-text">
+          {{ sprintProgressPercent }}%
+        </span>
       </div>
     </div>
-    <span class="progress-text">
-      {{ sprintProgressPercent }}%
-    </span>
+
+    <!-- Sprint Time -->
+    <div class="summary-item">
+      <span class="label">Sprint Time</span>
+
+      <span class="value time">
+        <span class="material-icons">schedule</span>
+        {{ sprintDaysLeft }}
+        {{ sprintDaysLeft === 1 ? 'day left' : 'days left' }}
+      </span>
+    </div>
+
+    <!-- Task Status -->
+    <div class="summary-item">
+      <span class="label">Task Status</span>
+
+      <span class="value total">
+        <span class="material-icons">list_alt</span>
+        Total: {{ sprintTotalTasks }}
+      </span>
+
+      <span class="value completed">
+        <span class="material-icons">check_circle</span>
+        Completed: {{ sprintCompletedTasks }}
+      </span>
+
+      <span class="value remaining">
+        <span class="material-icons">pending_actions</span>
+        Remaining: {{ sprintRemainingTasks }}
+      </span>
+    </div>
+
   </div>
+
+</div>
+}
+  </div>
+
 
   <!-- tasks overdue -->
   <div class="overdue-tasks">
@@ -107,6 +189,7 @@
   </div>
 
 </div>
+
 
 <div class="board-layout" cdkDropListGroup cdkScrollable>
 

@@ -1316,6 +1316,173 @@ export class BoardComponent {
 
     this.overdueTasksCount = overdue;
   }
+
+  //sprint summary
+  showSprintSummaryModal = false;
+
+  sprintShiftLabel = '';
+
+  generateSprintShiftLabel() {
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const firstDay = this.workingDays[0];
+    const lastDay = this.workingDays[this.workingDays.length - 1];
+
+    const currentDay = today.getDay();
+
+    const start = new Date(today);
+    start.setDate(today.getDate() - (currentDay - firstDay));
+
+    const end = new Date(start);
+    end.setDate(start.getDate() + (lastDay - firstDay));
+
+    const options: Intl.DateTimeFormatOptions = {
+      month: 'short',
+      day: 'numeric'
+    };
+
+    const startText = start.toLocaleDateString('en-US', options);
+    const endText = end.toLocaleDateString('en-US', options);
+
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    this.sprintShiftLabel =
+      `${days[firstDay]}–${days[lastDay]} (${startText} - ${endText})`;
+
+  }
+
+  // sprint time
+  sprintDaysLeft: number = 0;
+
+calculateSprintDaysLeft() {
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const currentDay = today.getDay();
+
+  const firstWorkDay = this.workingDays[0];
+  const lastWorkDay = this.workingDays[this.workingDays.length - 1];
+
+  // sprint start
+  const startOfSprint = new Date(today);
+  startOfSprint.setDate(today.getDate() - (currentDay - firstWorkDay));
+
+  // sprint end
+  const endOfSprint = new Date(startOfSprint);
+  endOfSprint.setDate(startOfSprint.getDate() + (lastWorkDay - firstWorkDay));
+
+  let daysLeft = 0;
+
+  const checkDate = new Date(today);
+
+  while (checkDate <= endOfSprint) {
+
+    if (this.workingDays.includes(checkDate.getDay())) {
+      daysLeft++;
+    }
+
+    checkDate.setDate(checkDate.getDate() + 1);
+  }
+
+  this.sprintDaysLeft = daysLeft;
+
+}
+
+  // sprint task stats
+  sprintTotalTasks: number = 0;
+  sprintCompletedTasks: number = 0;
+  sprintRemainingTasks: number = 0;
+
+  calculateSprintTaskStats() {
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const currentDay = today.getDay();
+
+    const firstWorkDay = this.workingDays[0];
+    const lastWorkDay = this.workingDays[this.workingDays.length - 1];
+
+    // sprint start
+    const startOfSprint = new Date(today);
+    startOfSprint.setDate(today.getDate() - (currentDay - firstWorkDay));
+    startOfSprint.setHours(0, 0, 0, 0);
+
+    // sprint end
+    const endOfSprint = new Date(startOfSprint);
+    endOfSprint.setDate(startOfSprint.getDate() + (lastWorkDay - firstWorkDay));
+    endOfSprint.setHours(23, 59, 59, 999);
+
+    let sprintTasks: any[] = [];
+    let completedTasks: any[] = [];
+
+    this.columns.forEach(column => {
+
+      column.tasks.forEach(task => {
+
+        if (!task.dueDate) return;
+
+        const due = new Date(task.dueDate);
+
+        if (due >= startOfSprint && due <= endOfSprint) {
+
+          sprintTasks.push(task);
+
+          const title = column.title.toLowerCase();
+
+          if (title === 'completed' || title === 'delivered') {
+            completedTasks.push(task);
+          }
+
+        }
+
+      });
+
+    });
+
+    this.sprintTotalTasks = sprintTasks.length;
+    this.sprintCompletedTasks = completedTasks.length;
+    this.sprintRemainingTasks =
+      this.sprintTotalTasks - this.sprintCompletedTasks;
+
+  }
+
+  openSprintSummary() {
+
+    this.calculateSprintProgress();
+    this.calculateOverdueTasks();
+    this.generateSprintShiftLabel();
+
+    this.showSprintSummaryModal = true;
+
+  }
+
+  closeSprintSummary() {
+    this.showSprintSummaryModal = false;
+  }
+
+  toggleSprintSummary(event: MouseEvent) {
+
+    event.stopPropagation();
+
+    this.calculateSprintProgress();
+    this.calculateOverdueTasks();
+
+    this.calculateSprintDaysLeft();
+    this.calculateSprintTaskStats();
+
+    this.generateSprintShiftLabel();
+
+    this.showSprintSummaryModal = !this.showSprintSummaryModal;
+
+  }
+  @HostListener('document:click')
+  handleOutsideClick() {
+    this.showSprintSummaryModal = false;
+  }
 }
 
 
