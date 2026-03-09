@@ -6,13 +6,6 @@
       "email": "jameelasfer@gmail.com",
       "password": "87654321",
       "officeId": "OT201201"
-    },
-    {
-      "id": "044320a2-0f02-41ac-90ff-3a264f2ccf3d",
-      "name": "Lena",
-      "email": "lena123@gmail.com",
-      "password": "lenatamil",
-      "officeId": "OT201280"
     }
   ],
   "boards": [
@@ -71,36 +64,6 @@
               "enteredDate": "2026-03-03T18:30:00.000Z"
             }
           ]
-        },
-        {
-          "id": "delivered",
-          "title": "Delivered",
-          "color": "blue",
-          "tasks": []
-        }
-      ]
-    },
-    {
-      "id": "b5fa",
-      "userId": "044320a2-0f02-41ac-90ff-3a264f2ccf3d",
-      "columns": [
-        {
-          "id": "todo",
-          "title": "To Do",
-          "color": "red",
-          "tasks": []
-        },
-        {
-          "id": "progress",
-          "title": "In Progress",
-          "color": "yellow",
-          "tasks": []
-        },
-        {
-          "id": "completed",
-          "title": "Completed",
-          "color": "green",
-          "tasks": []
         },
         {
           "id": "delivered",

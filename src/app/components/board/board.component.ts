@@ -762,7 +762,8 @@ export class BoardComponent {
   showResetBoardConfirm = false;
 
   toggleToolbarMenu(event: MouseEvent) {
-    event.stopPropagation()
+    event.stopPropagation();
+    this.closeAllPopups();
     this.isToolbarMenuOpen = !this.isToolbarMenuOpen;
   }
 
@@ -999,9 +1000,16 @@ export class BoardComponent {
     this.isToolbarMenuOpen = false;
   }
 
-  //edit profile
-  showEditProfileModal = false;
 
+  // =============================
+  // PROFILE MODALS
+  // =============================
+
+  showViewProfileModal = false;
+  showEditProfileModal = false;
+  showDeleteProfileModal = false;
+
+  // USER FIELDS
   name = '';
   email = '';
   password = '';
@@ -1010,6 +1018,92 @@ export class BoardComponent {
 
   attemptedProfileSubmit = false;
   isProcessing = false;
+
+  showProfilePopup = false;
+
+  closeAllPopups(){
+    this.isToolbarMenuOpen = false;
+  this.showProfilePopup = false;
+  this.showSprintSummaryModal = false;
+}
+
+  toggleProfilePopup(event: MouseEvent) {
+  event.stopPropagation();
+  this.closeAllPopups();
+
+  this.currentUser = this.authService.getCurrentUser();
+
+  this.showProfilePopup = !this.showProfilePopup;
+}
+
+  closeProfilePopup() {
+    this.showProfilePopup = false;
+  }
+
+
+  // =============================
+  // OPEN VIEW PROFILE
+  // =============================
+
+  openViewProfile() {
+
+    const user = this.authService.getCurrentUser();
+
+    if (!user) {
+      console.log('No user found');
+      return;
+    }
+
+    this.name = user.name;
+    this.email = user.email;
+    this.officeId = user.officeId;
+
+    this.showViewProfileModal = true;
+  }
+
+  // =============================
+  // CLOSE VIEW PROFILE
+  // =============================
+
+  closeViewProfile() {
+    this.showViewProfileModal = false;
+  }
+
+  // =============================
+  // GO TO EDIT PROFILE
+  // =============================
+
+  goToEditProfile() {
+
+    this.showViewProfileModal = false;
+
+    const user = this.authService.getCurrentUser();
+
+    if (!user) return;
+
+    this.name = user.name;
+    this.email = user.email;
+    this.officeId = user.officeId;
+
+    this.password = '';
+    this.confirmPassword = '';
+
+    this.showEditProfileModal = true;
+  }
+
+  // =============================
+  // BACK TO VIEW PROFILE
+  // =============================
+
+  backToViewProfile() {
+
+    this.showEditProfileModal = false;
+
+    this.openViewProfile();
+  }
+
+
+  //edit profile
 
   openEditProfile() {
     const user = this.authService.getCurrentUser();
@@ -1137,6 +1231,7 @@ export class BoardComponent {
     });
 
   }
+
   // ===============================
   // DELETE PROFILE FLOW
   // ===============================
@@ -1356,40 +1451,40 @@ export class BoardComponent {
   // sprint time
   sprintDaysLeft: number = 0;
 
-calculateSprintDaysLeft() {
+  calculateSprintDaysLeft() {
 
-  const today = new Date();
-  today.setHours(0,0,0,0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  const currentDay = today.getDay();
+    const currentDay = today.getDay();
 
-  const firstWorkDay = this.workingDays[0];
-  const lastWorkDay = this.workingDays[this.workingDays.length - 1];
+    const firstWorkDay = this.workingDays[0];
+    const lastWorkDay = this.workingDays[this.workingDays.length - 1];
 
-  // sprint start
-  const startOfSprint = new Date(today);
-  startOfSprint.setDate(today.getDate() - (currentDay - firstWorkDay));
+    // sprint start
+    const startOfSprint = new Date(today);
+    startOfSprint.setDate(today.getDate() - (currentDay - firstWorkDay));
 
-  // sprint end
-  const endOfSprint = new Date(startOfSprint);
-  endOfSprint.setDate(startOfSprint.getDate() + (lastWorkDay - firstWorkDay));
+    // sprint end
+    const endOfSprint = new Date(startOfSprint);
+    endOfSprint.setDate(startOfSprint.getDate() + (lastWorkDay - firstWorkDay));
 
-  let daysLeft = 0;
+    let daysLeft = 0;
 
-  const checkDate = new Date(today);
+    const checkDate = new Date(today);
 
-  while (checkDate <= endOfSprint) {
+    while (checkDate <= endOfSprint) {
 
-    if (this.workingDays.includes(checkDate.getDay())) {
-      daysLeft++;
+      if (this.workingDays.includes(checkDate.getDay())) {
+        daysLeft++;
+      }
+
+      checkDate.setDate(checkDate.getDate() + 1);
     }
 
-    checkDate.setDate(checkDate.getDate() + 1);
+    this.sprintDaysLeft = daysLeft;
+
   }
-
-  this.sprintDaysLeft = daysLeft;
-
-}
 
   // sprint task stats
   sprintTotalTasks: number = 0;
@@ -1451,7 +1546,6 @@ calculateSprintDaysLeft() {
   }
 
   openSprintSummary() {
-
     this.calculateSprintProgress();
     this.calculateOverdueTasks();
     this.generateSprintShiftLabel();
@@ -1467,7 +1561,7 @@ calculateSprintDaysLeft() {
   toggleSprintSummary(event: MouseEvent) {
 
     event.stopPropagation();
-
+    this.closeAllPopups();
     this.calculateSprintProgress();
     this.calculateOverdueTasks();
 
@@ -1479,10 +1573,23 @@ calculateSprintDaysLeft() {
     this.showSprintSummaryModal = !this.showSprintSummaryModal;
 
   }
-  @HostListener('document:click')
-  handleOutsideClick() {
-    this.showSprintSummaryModal = false;
-  }
+  isAnyModalOpen(): boolean {
+  return (
+    this.showEditProfileModal ||
+    this.showViewProfileModal ||
+    this.showDeleteProfileModal
+  );
+}
+
+@HostListener('document:click')
+handleOutsideClick() {
+
+  if (this.isAnyModalOpen()) return;
+
+  this.showSprintSummaryModal = false;
+  this.showProfilePopup = false;
+  this.isToolbarMenuOpen = false;
+}
 }
 
 
