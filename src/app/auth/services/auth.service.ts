@@ -206,11 +206,18 @@ export class AuthService {
   }
 
   //get current user
-  getCurrentUser(): User | null {
-    const user = JSON.parse(localStorage.getItem(this.currentUserKey) || 'null');
+  private _cachedUser: User | null = null;
+
+getCurrentUser(): User | null {
+  const user = JSON.parse(localStorage.getItem(this.currentUserKey) || 'null');
+
+  if (JSON.stringify(user) !== JSON.stringify(this._cachedUser)) {
     console.log('[AuthService] Current User:', user);
-    return user;
+    this._cachedUser = user;
   }
+
+  return user;
+}
 
   //update profile
   updateProfile(updatedUser: User) {

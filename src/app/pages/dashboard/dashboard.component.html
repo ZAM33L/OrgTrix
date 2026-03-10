@@ -1,0 +1,118 @@
+<div class="dashboard-header">
+
+  <div class="dashboard-title">
+    <span class="material-icons">dashboard</span>
+    <h1>Dashboard</h1>
+  </div>
+
+  <div class="dashboard-actions">
+    <button class="refresh-btn" (click)="loadDashboard()">
+      <span class="material-icons">refresh</span>
+    </button>
+  </div>
+
+</div>
+<div class="dashboard-container">
+
+  <!-- TASK SUMMARY -->
+  <div class="dashboard-grid">
+
+    <div class="stat-card">
+      <div class="stat-title">Total Tasks</div>
+      <div class="stat-value">{{ totalTasks }}</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">Done Tasks</div>
+      <div class="stat-value">{{ doneTasks }}</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">Pending Tasks</div>
+      <div class="stat-value">{{ pendingTasks }}</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">Completed</div>
+      <div class="stat-value">{{ completedTasks }}</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">Delivered</div>
+      <div class="stat-value">{{ deliveredTasks }}</div>
+    </div>
+
+  </div>
+
+
+  <!-- PRIORITY STATS -->
+  <h2 class="section-title">Priority Overview</h2>
+
+  <div class="dashboard-grid">
+
+    <div class="stat-card high">
+      <div class="stat-title">High Priority</div>
+      <div class="stat-value">{{ highPriority }}</div>
+    </div>
+
+    <div class="stat-card medium">
+      <div class="stat-title">Medium Priority</div>
+      <div class="stat-value">{{ mediumPriority }}</div>
+    </div>
+
+    <div class="stat-card low">
+      <div class="stat-title">Low Priority</div>
+      <div class="stat-value">{{ lowPriority }}</div>
+    </div>
+
+  </div>
+
+
+  <!-- COLUMN ANALYTICS -->
+  <h2 class="section-title">Column Analytics</h2>
+
+  <div class="dashboard-grid">
+
+    @for (column of columnStats; track column.id) {
+
+      <div class="stat-card">
+
+        <div class="stat-title">
+          {{ column.title }}
+        </div>
+
+        <div class="stat-value">
+          {{ column.count }}
+        </div>
+
+      </div>
+
+    }
+
+  </div>
+
+
+  <!-- RECENT TASKS -->
+  <h2 class="section-title">Recent Tasks</h2>
+
+  <div class="recent-tasks">
+
+    @for (task of recentTasks; track task.id) {
+
+      <div class="task-card">
+
+        <div class="task-title">
+          {{ task.title }}
+        </div>
+
+        <div class="task-meta">
+          Priority: {{ task.priority }}
+        </div>
+
+      </div>
+
+    }
+
+  </div>
+
+</div>

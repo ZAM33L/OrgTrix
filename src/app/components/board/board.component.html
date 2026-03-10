@@ -1,80 +1,4 @@
-<header class="app-header">
 
-  <!-- LEFT SIDE -->
-  <div class="header-left">
-    <div class="header-icon">
-      <span class="block red"></span>
-      <span class="block yellow"></span>
-      <span class="block green"></span>
-      <span class="block blue"></span>
-    </div>
-    <h1>OrgTrix</h1>
-  </div>
-
-  <!-- RIGHT SIDE (Logged In User) -->
-  @if(currentUser){
-  <div class="header-user" (click)="toggleProfilePopup($event)">
-    <div class="avatar">
-      {{ (currentUser.name || currentUser.officeId)?.charAt(0) }}
-    </div>
-    <span class="username">
-      {{ currentUser.name || currentUser.officeId }}
-    </span>
-  </div>
-  }
-  @if (showProfilePopup) {
-  <div class="profile-popup" (click)="$event.stopPropagation()">
-    <div class="popup-header">
-      <span class="material-icons">account_circle</span>
-      <span>Profile</span>
-
-      <button class="popup-close" (click)="closeProfilePopup()">
-        <span class="material-icons">close</span>
-      </button>
-    </div>
-
-    <div class="profile-content">
-
-      <div class="profile-row">
-        <label>Name</label>
-        <span>{{ currentUser?.name }}</span>
-      </div>
-
-      <div class="profile-row">
-        <label>Email</label>
-        <span>{{ currentUser?.email }}</span>
-      </div>
-
-      <div class="profile-row">
-        <label>Office ID</label>
-        <span>{{ currentUser?.officeId }}</span>
-      </div>
-
-      <div class="profile-row">
-        <label>Password</label>
-        <span>********</span>
-      </div>
-
-    </div>
-
-    <div class="profile-actions">
-
-      <button class="edit-btn" (click)="goToEditProfile()">
-        <span class="material-icons">edit</span>
-        Update
-      </button>
-
-      <button class="delete-btn" (click)="openDeleteProfileConfirm()">
-        <span class="material-icons">delete</span>
-        Delete
-      </button>
-
-    </div>
-
-  </div>
-  }
-
-</header>
 <div class="board-toolbar">
 
   <!-- LEFT SIDE (Desktop Only) -->
@@ -224,6 +148,10 @@
         Delete Profile
       </button>
       <hr /> -->
+
+      <button (click)="goToDashboard()">
+        Dashboard
+      </button>
       <button (click)="openResetBoardConfirm(); closeToolbarMenu()">
         Reset Board
       </button>

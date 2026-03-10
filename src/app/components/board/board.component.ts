@@ -1590,6 +1590,13 @@ handleOutsideClick() {
   this.showProfilePopup = false;
   this.isToolbarMenuOpen = false;
 }
+
+//dashboard
+
+goToDashboard() {
+  this.router.navigate(['/dashboard']);
+}
+
 }
 
 

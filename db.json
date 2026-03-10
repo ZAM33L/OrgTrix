@@ -19,14 +19,6 @@
           "color": "red",
           "tasks": [
             {
-              "id": 1773000000003,
-              "title": "Sprint task 3",
-              "description": "UI polish",
-              "priority": "Low",
-              "dueDate": "2026-03-05T18:30:00.000Z",
-              "enteredDate": "2026-03-02T18:30:00.000Z"
-            },
-            {
               "id": 1773000000002,
               "title": "Sprint task 2",
               "description": "Fix login bug",
@@ -48,7 +40,16 @@
           "id": "progress",
           "title": "In Progress",
           "color": "yellow",
-          "tasks": []
+          "tasks": [
+            {
+              "id": 1773067055646,
+              "title": "day 7",
+              "description": "do work",
+              "priority": "Medium",
+              "dueDate": "2026-03-12T18:30:00.000Z",
+              "enteredDate": "2026-03-09T14:36:53.107Z"
+            }
+          ]
         },
         {
           "id": "completed",
@@ -56,14 +57,53 @@
           "color": "green",
           "tasks": [
             {
-              "id": 1773000000004,
-              "title": "Sprint task 4",
-              "description": "Add search feature",
+              "id": 1773067157315,
+              "title": "day 8",
+              "description": "do work",
               "priority": "High",
-              "dueDate": "2026-03-06T18:30:00.000Z",
-              "enteredDate": "2026-03-03T18:30:00.000Z"
+              "dueDate": "2026-03-12T18:30:00.000Z",
+              "enteredDate": "2026-03-09T14:37:35.287Z"
             }
           ]
+        },
+        {
+          "id": "delivered",
+          "title": "Delivered",
+          "color": "blue",
+          "tasks": [
+            {
+              "id": 1773067013956,
+              "title": "day 9",
+              "description": "do work",
+              "priority": "Low",
+              "dueDate": "2026-03-11T18:30:00.000Z",
+              "enteredDate": "2026-03-09T14:35:57.436Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4ebc",
+      "userId": "d146d4e2-a669-4a6d-b4b1-15f61f0f5297",
+      "columns": [
+        {
+          "id": "todo",
+          "title": "To Do",
+          "color": "red",
+          "tasks": []
+        },
+        {
+          "id": "progress",
+          "title": "In Progress",
+          "color": "yellow",
+          "tasks": []
+        },
+        {
+          "id": "completed",
+          "title": "Completed",
+          "color": "green",
+          "tasks": []
         },
         {
           "id": "delivered",

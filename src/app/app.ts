@@ -1,11 +1,15 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { HeaderComponent } from './components/header/header.component';
+import { AuthService } from './auth/services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterModule], // <-- for router-outlet
-  template: `<router-outlet></router-outlet>`,
-  styleUrls: ['./app.css']
+  imports: [RouterModule,HeaderComponent], 
+  templateUrl: './app.html',
+  styleUrl: './app.css'
 })
-export class App {}
+export class App {
+  constructor(public authService: AuthService) {}
+}
