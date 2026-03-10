@@ -85,6 +85,13 @@ export class DashboardComponent implements OnInit {
     this.setPriorityStats();
     this.setRecentTasks();
 
+    //sprint stats
+    this.calculateSprintProgress();
+    this.calculateSprintDaysLeft();
+    this.calculateSprintTaskStats();
+    this.generateSprintShiftLabel();
+    this.calculateOverdueTasks();
+
   }
 
   //get all tasks
@@ -198,6 +205,236 @@ export class DashboardComponent implements OnInit {
 
       })
       .slice(0, 5);
+
+  }
+
+  //SPRINT DATA
+  
+  // sprint progress
+  sprintProgressPercent: number = 0;
+  workingDays: number[] = [1, 2, 3, 4, 5]; // Mon-Fri default
+
+  calculateSprintProgress() {
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const currentDay = today.getDay();
+
+    const firstWorkDay = this.workingDays[0];
+    const lastWorkDay = this.workingDays[this.workingDays.length - 1];
+
+    // calculate sprint start
+    const startOfSprint = new Date(today);
+    startOfSprint.setDate(today.getDate() - (currentDay - firstWorkDay));
+    startOfSprint.setHours(0, 0, 0, 0);
+
+    // calculate sprint end
+    const endOfSprint = new Date(startOfSprint);
+    endOfSprint.setDate(startOfSprint.getDate() + (lastWorkDay - firstWorkDay));
+    endOfSprint.setHours(23, 59, 59, 999);
+
+    let sprintTasks: any[] = [];
+    let completedSprintTasks: any[] = [];
+
+    this.columns.forEach(column => {
+
+      column.tasks.forEach(task => {
+
+        if (!task.dueDate) return;
+
+        const due = new Date(task.dueDate);
+
+        if (due >= startOfSprint && due <= endOfSprint) {
+
+          sprintTasks.push(task);
+
+          const title = column.title.toLowerCase();
+
+          if (title === 'completed' || title === 'delivered') {
+            completedSprintTasks.push(task);
+          }
+
+        }
+
+      });
+
+    });
+
+    if (sprintTasks.length === 0) {
+      this.sprintProgressPercent = 0;
+      return;
+    }
+
+    this.sprintProgressPercent = Math.round(
+      (completedSprintTasks.length / sprintTasks.length) * 100
+    );
+
+  }
+
+  //tasks overdue
+  overdueTasksCount: number = 0;
+
+  calculateOverdueTasks() {
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);   // remove time
+
+    let overdue = 0;
+
+    this.columns.forEach(column => {
+
+      column.tasks.forEach(task => {
+
+        if (!task.dueDate) return;
+
+        const due = new Date(task.dueDate);
+        due.setHours(0, 0, 0, 0);  // remove time
+
+        const title = column.title.toLowerCase();
+        const isFinished = title === 'delivered' || title === 'completed';
+
+        if (due < today && !isFinished) {
+          overdue++;
+        }
+
+      });
+
+    });
+
+    this.overdueTasksCount = overdue;
+  }
+
+  //sprint summary
+  showSprintSummaryModal = false;
+
+  sprintShiftLabel = '';
+
+  generateSprintShiftLabel() {
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const firstDay = this.workingDays[0];
+    const lastDay = this.workingDays[this.workingDays.length - 1];
+
+    const currentDay = today.getDay();
+
+    const start = new Date(today);
+    start.setDate(today.getDate() - (currentDay - firstDay));
+
+    const end = new Date(start);
+    end.setDate(start.getDate() + (lastDay - firstDay));
+
+    const options: Intl.DateTimeFormatOptions = {
+      month: 'short',
+      day: 'numeric'
+    };
+
+    const startText = start.toLocaleDateString('en-US', options);
+    const endText = end.toLocaleDateString('en-US', options);
+
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    this.sprintShiftLabel =
+      `${days[firstDay]}–${days[lastDay]} (${startText} - ${endText})`;
+
+  }
+
+  // sprint time
+  sprintDaysLeft: number = 0;
+
+  calculateSprintDaysLeft() {
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const currentDay = today.getDay();
+
+    const firstWorkDay = this.workingDays[0];
+    const lastWorkDay = this.workingDays[this.workingDays.length - 1];
+
+    // sprint start
+    const startOfSprint = new Date(today);
+    startOfSprint.setDate(today.getDate() - (currentDay - firstWorkDay));
+
+    // sprint end
+    const endOfSprint = new Date(startOfSprint);
+    endOfSprint.setDate(startOfSprint.getDate() + (lastWorkDay - firstWorkDay));
+
+    let daysLeft = 0;
+
+    const checkDate = new Date(today);
+
+    while (checkDate <= endOfSprint) {
+
+      if (this.workingDays.includes(checkDate.getDay())) {
+        daysLeft++;
+      }
+
+      checkDate.setDate(checkDate.getDate() + 1);
+    }
+
+    this.sprintDaysLeft = daysLeft;
+
+  }
+
+  // sprint task stats
+  sprintTotalTasks: number = 0;
+  sprintCompletedTasks: number = 0;
+  sprintRemainingTasks: number = 0;
+
+  calculateSprintTaskStats() {
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const currentDay = today.getDay();
+
+    const firstWorkDay = this.workingDays[0];
+    const lastWorkDay = this.workingDays[this.workingDays.length - 1];
+
+    // sprint start
+    const startOfSprint = new Date(today);
+    startOfSprint.setDate(today.getDate() - (currentDay - firstWorkDay));
+    startOfSprint.setHours(0, 0, 0, 0);
+
+    // sprint end
+    const endOfSprint = new Date(startOfSprint);
+    endOfSprint.setDate(startOfSprint.getDate() + (lastWorkDay - firstWorkDay));
+    endOfSprint.setHours(23, 59, 59, 999);
+
+    let sprintTasks: any[] = [];
+    let completedTasks: any[] = [];
+
+    this.columns.forEach(column => {
+
+      column.tasks.forEach(task => {
+
+        if (!task.dueDate) return;
+
+        const due = new Date(task.dueDate);
+
+        if (due >= startOfSprint && due <= endOfSprint) {
+
+          sprintTasks.push(task);
+
+          const title = column.title.toLowerCase();
+
+          if (title === 'completed' || title === 'delivered') {
+            completedTasks.push(task);
+          }
+
+        }
+
+      });
+
+    });
+
+    this.sprintTotalTasks = sprintTasks.length;
+    this.sprintCompletedTasks = completedTasks.length;
+    this.sprintRemainingTasks =
+      this.sprintTotalTasks - this.sprintCompletedTasks;
 
   }
 

@@ -105,16 +105,15 @@
 
 
   <!-- tasks overdue -->
-  <div class="overdue-tasks">
-
-    <span>Overdue Work : </span>
-
-    <span class="overdue-count">
-      ⚠ {{ overdueTasksCount }}
+<div class="overdue-tasks">
+  <span class="overdue-label">Overdue Work : </span>
+  <span class="overdue-count">
+    ⚠ {{ overdueTasksCount }}
+    <span class="overdue-text">
       {{ overdueTasksCount === 1 ? 'task overdue' : 'tasks overdue' }}
     </span>
-
-  </div>
+  </span>
+</div>
 
   <!-- RIGHT SIDE MENU -->
   <div class="toolbar-menu">

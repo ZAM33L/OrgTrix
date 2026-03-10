@@ -1,129 +1,337 @@
-.dashboard-container{
-  padding:20px;
+/* ===================================== */
+/* DASHBOARD STYLING (MOBILE-PROOF)     */
+/* ===================================== */
+
+/* GLOBAL BOX-SIZING */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-.section-title{
-  margin:30px 0 15px;
-  font-size:18px;
-  font-weight:600;
+/* CONTAINER */
+.dashboard-container {
+  padding: 20px;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-/* GRID */
-
-.dashboard-grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
-  gap:16px;
+/* SECTION TITLES */
+.section-title {
+  margin: 30px 0 15px;
+  font-size: 18px;
+  font-weight: 600;
 }
 
-/* CARDS */
-
-.stat-card{
-  background:white;
-  border-radius:10px;
-  padding:18px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.08);
-  text-align:center;
+/* ===================== GRID ===================== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  width: 100%;
 }
 
-.stat-title{
-  font-size:13px;
-  color:#777;
-  margin-bottom:6px;
+/* ===================== STAT CARDS ===================== */
+.stat-card {
+  background: white;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  text-align: center;
 }
 
-.stat-value{
-  font-size:26px;
-  font-weight:700;
+.stat-title {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 700;
 }
 
 /* PRIORITY COLORS */
-
-.high{
-  border-top:4px solid #ff4d4f;
+.high {
+  border-top: 4px solid #ff4d4f;
 }
 
-.medium{
-  border-top:4px solid #faad14;
+.medium {
+  border-top: 4px solid #faad14;
 }
 
-.low{
-  border-top:4px solid #52c41a;
+.low {
+  border-top: 4px solid #52c41a;
 }
 
-/* RECENT TASKS */
-
-.recent-tasks{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+/* ===================== RECENT TASKS ===================== */
+.recent-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.task-card{
-  background:white;
-  padding:14px;
-  border-radius:8px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+.task-card {
+  background: white;
+  padding: 14px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-.task-title{
-  font-weight:600;
+.task-title {
+  font-weight: 600;
 }
 
-.task-meta{
-  font-size:12px;
-  color:#777;
-  margin-top:4px;
+.task-meta {
+  font-size: 12px;
+  color: #777;
+  margin-top: 4px;
 }
 
-.dashboard-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  padding:20px 30px;
-  margin-bottom:20px;
-
-  background:#ffffff;
-  border-bottom:1px solid #e5e7eb;
+/* ===================== DASHBOARD HEADER / TOOLBAR ===================== */
+.dashboard-toolbar {
+  position: sticky;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  gap: 12px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  z-index: 1000;
+  flex-wrap: wrap;
 }
 
-.dashboard-title{
-  display:flex;
-  align-items:center;
-  gap:10px;
+.dashboard-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 18px;
+  color: #111827;
 }
 
-.dashboard-title h1{
-  margin:0;
-  font-size:22px;
-  font-weight:600;
+.dashboard-title .material-icons {
+  font-size: 24px;
+  color: #3b82f6;
 }
 
-.dashboard-title .material-icons{
-  color:#4f46e5;
-  font-size:26px;
+/* DASHBOARD ACTIONS */
+.dashboard-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.dashboard-actions{
-  display:flex;
-  gap:10px;
+.refresh-btn {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
 }
 
-.refresh-btn{
-  display:flex;
-  align-items:center;
-  gap:6px;
-
-  border:none;
-  background:#4f46e5;
-  color:white;
-
-  padding:8px 14px;
-  border-radius:8px;
-  cursor:pointer;
+.refresh-btn:hover {
+  background: #e5e7eb;
 }
 
-.refresh-btn:hover{
-  background:#4338ca;
+.refresh-btn .material-icons {
+  font-size: 20px;
+  color: #3b82f6;
+}
+
+/* ===================== SPRINT PROGRESS ===================== */
+/* ================= DASHBOARD SPRINT PROGRESS ================= */
+
+/* Wrapper around the progress indicator */
+.sprint-progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;          /* space between label, bar, and percentage */
+  flex-shrink: 1;     /* allow it to shrink if toolbar is narrow */
+  min-width: 0;       /* important for flex text truncation */
+}
+
+/* Actual progress container */
+.sprint-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;       /* prevent child from forcing flex width */
+}
+
+/* Label text: prevent wrapping */
+.sprint-progress .sprint-label {
+  white-space: nowrap;        /* keep on one line */
+  overflow: hidden;           /* hide overflow if really narrow */
+  text-overflow: ellipsis;    /* show "..." if text is too long */
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+/* Progress bar container */
+.progress-bar.clickable {
+  width: 140px;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0; /* don’t shrink the bar */
+}
+
+/* Filled part of the progress */
+.progress-bar.clickable .progress-fill {
+  height: 100%;
+  background: #22c55e;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Progress percentage text */
+.progress-text {
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 35px;
+  text-align: right;
+  color: #111827;
+  flex-shrink: 0; /* don’t shrink */
+}
+
+/* RESPONSIVE: mobile adjustments */
+@media (max-width: 768px) {
+  .sprint-progress-wrapper {
+    gap: 6px;
+  }
+
+  .progress-bar.clickable {
+    width: 100px;
+  }
+
+  .sprint-progress .sprint-label {
+    font-size: 13px;
+  }
+
+  .progress-text {
+    font-size: 12px;
+    min-width: 30px;
+  }
+}
+/* ===================== OVERDUE TASKS ===================== */
+.overdue-tasks {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.overdue-count {
+  font-size: 13px;
+  font-weight: 500;
+  color: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .overdue-label,
+  .overdue-text {
+    display: none;
+  }
+}
+
+/* ===================== SPRINT SUMMARY DASHBOARD ===================== */
+.sprint-summary-dashboard {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 100px;
+}
+
+.summary-item .label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.summary-item .value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.summary-item .value .material-icons {
+  font-size: 18px;
+}
+
+/* TASK STATS */
+.task-stats .task-values {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.task-stats .value.total .material-icons {
+  color: #3b82f6;
+}
+
+.task-stats .value.completed .material-icons {
+  color: #22c55e;
+}
+
+.task-stats .value.remaining .material-icons {
+  color: #f59e0b;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+  .dashboard-title h1 {
+    font-size: 16px;
+  }
+
+  .sprint-progress .sprint-label {
+    display: none;
+  }
+
+  .progress-bar.clickable,
+  .progress-bar.large {
+    width: 100%;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .sprint-summary-dashboard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .task-stats .task-values {
+    flex-direction: row;
+    gap: 8px;
+  }
 }

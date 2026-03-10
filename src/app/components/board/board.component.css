@@ -797,26 +797,26 @@ input[type="date"] {
 }
 
 /* tasks overdue */
-.overdue-tasks{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:2px;
-  margin-left:16px;
+
+.overdue-tasks {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  margin-left: 16px;
 }
 
-.overdue-count{
-  font-size:13px;
-  font-weight:500;
-  color:#ef4444;
+.overdue-count {
+  font-size: 13px;
+  font-weight: 500;
+  color: #ef4444;
 }
 
-@media (max-width:768px){
-
-  .overdue-tasks span:first-child{
-    display:none;
+@media (max-width: 768px) {
+  .overdue-label,
+  .overdue-text {
+    display: none;
   }
-
 }
 
 /* ===================================== */

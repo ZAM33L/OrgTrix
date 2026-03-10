@@ -1,10 +1,34 @@
-<div class="dashboard-header">
+<div class="dashboard-toolbar">
 
+  <!-- Dashboard Title -->
   <div class="dashboard-title">
     <span class="material-icons">dashboard</span>
     <h1>Dashboard</h1>
   </div>
 
+  <!-- Sprint Progress -->
+  <div class="sprint-progress-wrapper">
+    <div class="sprint-progress">
+      <span class="sprint-label">Weekly Sprint Progress</span>
+      <div class="progress-bar clickable" title="View Sprint Summary">
+        <div class="progress-fill" [style.width.%]="sprintProgressPercent"></div>
+      </div>
+      <span class="progress-text">{{ sprintProgressPercent }}%</span>
+    </div>
+  </div>
+
+  <!-- Overdue Tasks -->
+  <div class="overdue-tasks">
+    <span class="overdue-label">Overdue Work: </span>
+    <span class="overdue-count">
+      ⚠ {{ overdueTasksCount }}
+      <span class="overdue-text">
+        {{ overdueTasksCount === 1 ? 'task overdue' : 'tasks overdue' }}
+      </span>
+    </span>
+  </div>
+
+  <!-- Refresh Button -->
   <div class="dashboard-actions">
     <button class="refresh-btn" (click)="loadDashboard()">
       <span class="material-icons">refresh</span>
@@ -12,11 +36,57 @@
   </div>
 
 </div>
+
 <div class="dashboard-container">
 
-  <!-- TASK SUMMARY -->
-  <div class="dashboard-grid">
+  <!-- ===================== SPRINT SUMMARY ===================== -->
+  <div class="sprint-summary-dashboard">
 
+    <div class="summary-item">
+      <span class="label">Sprint Shift</span>
+      <span class="value">{{ sprintShiftLabel }}</span>
+    </div>
+
+    <div class="summary-item">
+      <span class="label">Sprint Progress</span>
+      <div class="summary-progress">
+        <div class="progress-bar large">
+          <div class="progress-fill" [style.width.%]="sprintProgressPercent"></div>
+        </div>
+        <span class="progress-text">{{ sprintProgressPercent }}%</span>
+      </div>
+    </div>
+
+    <div class="summary-item">
+      <span class="label">Sprint Time</span>
+      <span class="value time">
+        <span class="material-icons">schedule</span>
+        {{ sprintDaysLeft }} {{ sprintDaysLeft === 1 ? 'day left' : 'days left' }}
+      </span>
+    </div>
+
+    <div class="summary-item task-stats">
+      <span class="label">Tasks</span>
+      <div class="task-values">
+        <span class="value total">
+          <span class="material-icons">list_alt</span>
+          Total: {{ sprintTotalTasks }}
+        </span>
+        <span class="value completed">
+          <span class="material-icons">check_circle</span>
+          Completed: {{ sprintCompletedTasks }}
+        </span>
+        <span class="value remaining">
+          <span class="material-icons">pending_actions</span>
+          Remaining: {{ sprintRemainingTasks }}
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== TASK SUMMARY ===================== -->
+  <div class="dashboard-grid">
     <div class="stat-card">
       <div class="stat-title">Total Tasks</div>
       <div class="stat-value">{{ totalTasks }}</div>
@@ -41,15 +111,11 @@
       <div class="stat-title">Delivered</div>
       <div class="stat-value">{{ deliveredTasks }}</div>
     </div>
-
   </div>
 
-
-  <!-- PRIORITY STATS -->
+  <!-- ===================== PRIORITY OVERVIEW ===================== -->
   <h2 class="section-title">Priority Overview</h2>
-
   <div class="dashboard-grid">
-
     <div class="stat-card high">
       <div class="stat-title">High Priority</div>
       <div class="stat-value">{{ highPriority }}</div>
@@ -64,55 +130,28 @@
       <div class="stat-title">Low Priority</div>
       <div class="stat-value">{{ lowPriority }}</div>
     </div>
-
   </div>
 
-
-  <!-- COLUMN ANALYTICS -->
+  <!-- ===================== COLUMN ANALYTICS ===================== -->
   <h2 class="section-title">Column Analytics</h2>
-
   <div class="dashboard-grid">
-
     @for (column of columnStats; track column.id) {
-
       <div class="stat-card">
-
-        <div class="stat-title">
-          {{ column.title }}
-        </div>
-
-        <div class="stat-value">
-          {{ column.count }}
-        </div>
-
+        <div class="stat-title">{{ column.title }}</div>
+        <div class="stat-value">{{ column.count }}</div>
       </div>
-
     }
-
   </div>
 
-
-  <!-- RECENT TASKS -->
+  <!-- ===================== RECENT TASKS ===================== -->
   <h2 class="section-title">Recent Tasks</h2>
-
   <div class="recent-tasks">
-
     @for (task of recentTasks; track task.id) {
-
       <div class="task-card">
-
-        <div class="task-title">
-          {{ task.title }}
-        </div>
-
-        <div class="task-meta">
-          Priority: {{ task.priority }}
-        </div>
-
+        <div class="task-title">{{ task.title }}</div>
+        <div class="task-meta">Priority: {{ task.priority }}</div>
       </div>
-
     }
-
   </div>
 
 </div>
