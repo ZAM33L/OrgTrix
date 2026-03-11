@@ -80,7 +80,10 @@ export class BoardComponent {
     } else {
 
       this.boardService.updateBoard(this.boardId, this.columns)
-        .subscribe();
+        .subscribe({
+          next: () => { },
+          error: err => console.error('Board save failed', err)
+        });
     }
   }
 
@@ -149,11 +152,12 @@ export class BoardComponent {
         this.cdr.detectChanges();
 
       } else {
-
+        console.log('Creating first board for user');
         // First-time user → create board
         this.boardService.createBoard(this.columns)
           .subscribe(newBoard => {
             this.boardId = newBoard.id;
+            this.cdr.detectChanges();
           });
       }
     });
@@ -1021,20 +1025,20 @@ export class BoardComponent {
 
   showProfilePopup = false;
 
-  closeAllPopups(){
+  closeAllPopups() {
     this.isToolbarMenuOpen = false;
-  this.showProfilePopup = false;
-  this.showSprintSummaryModal = false;
-}
+    this.showProfilePopup = false;
+    this.showSprintSummaryModal = false;
+  }
 
   toggleProfilePopup(event: MouseEvent) {
-  event.stopPropagation();
-  this.closeAllPopups();
+    event.stopPropagation();
+    this.closeAllPopups();
 
-  this.currentUser = this.authService.getCurrentUser();
+    this.currentUser = this.authService.getCurrentUser();
 
-  this.showProfilePopup = !this.showProfilePopup;
-}
+    this.showProfilePopup = !this.showProfilePopup;
+  }
 
   closeProfilePopup() {
     this.showProfilePopup = false;
@@ -1574,28 +1578,28 @@ export class BoardComponent {
 
   }
   isAnyModalOpen(): boolean {
-  return (
-    this.showEditProfileModal ||
-    this.showViewProfileModal ||
-    this.showDeleteProfileModal
-  );
-}
+    return (
+      this.showEditProfileModal ||
+      this.showViewProfileModal ||
+      this.showDeleteProfileModal
+    );
+  }
 
-@HostListener('document:click')
-handleOutsideClick() {
+  @HostListener('document:click')
+  handleOutsideClick() {
 
-  if (this.isAnyModalOpen()) return;
+    if (this.isAnyModalOpen()) return;
 
-  this.showSprintSummaryModal = false;
-  this.showProfilePopup = false;
-  this.isToolbarMenuOpen = false;
-}
+    this.showSprintSummaryModal = false;
+    this.showProfilePopup = false;
+    this.isToolbarMenuOpen = false;
+  }
 
-//dashboard
+  //dashboard
 
-goToDashboard() {
-  this.router.navigate(['/dashboard']);
-}
+  goToDashboard() {
+    this.router.navigate(['/dashboard']);
+  }
 
 }
 

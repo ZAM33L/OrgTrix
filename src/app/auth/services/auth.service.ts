@@ -254,4 +254,18 @@ getCurrentUser(): User | null {
       })
     );
   }
+
+  verifyGoogleToken(token: string): Observable<{ success: boolean; message: string }> {
+  return this.http.post<any>('http://localhost:3000/auth/google', { token }).pipe(
+    map(res => {
+      if (res?.user && res?.token) {
+        // save logged-in user locally
+        localStorage.setItem(this.currentUserKey, JSON.stringify(res.user));
+        return { success: true, message: 'Login successful!' };
+      }
+      return { success: false, message: 'Login failed!' };
+    }),
+    catchError(() => of({ success: false, message: 'Server error. Try again.' }))
+  );
+}
 }

@@ -10,6 +10,13 @@ import { AuthService } from './auth/services/auth.service';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
+
 export class App {
+
   constructor(public authService: AuthService) {}
+
+  get currentUser() {
+    return this.authService.getCurrentUser();
+  }
+
 }

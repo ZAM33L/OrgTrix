@@ -1,9 +1,11 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { catchError, throwError,of } from 'rxjs';
+import { catchError, throwError, of } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+
 
 @Component({
   selector: 'app-signin',
@@ -13,7 +15,7 @@ import { catchError, throwError,of } from 'rxjs';
   styleUrls: ['./signin.component.css']
 })
 
-export class SigninComponent {
+export class SigninComponent implements AfterViewInit {
   identifier = '';
   password = '';
   attemptedSubmitSignin = false;
@@ -31,6 +33,38 @@ export class SigninComponent {
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
+
+  ngAfterViewInit() {
+    // Wait until window.google exists
+    const interval = setInterval(() => {
+      if (window.google && window.google.accounts?.id) {
+        clearInterval(interval);
+
+        window.google.accounts.id.initialize({
+          client_id: environment.googleClientId,
+          callback: (response: any) => this.handleGoogleResponse(response)
+        });
+
+        window.google.accounts.id.renderButton(
+          document.getElementById('googleSignInBtn')!,
+          { theme: 'outline', size: 'large', width: 250 }
+        );
+      }
+    }, 100);
+  }
+
+    handleGoogleResponse(response: any) {
+    this.isProcessing = true;
+    this.authService.verifyGoogleToken(response.credential).subscribe(result => {
+      this.isProcessing = false;
+      if (result?.success) {
+        this.showNotification('Logged in with Google!', 'success');
+        setTimeout(() => this.router.navigate(['/board']), 500);
+      } else {
+        this.showNotification(result?.message || 'Google login failed', 'info');
+      }
+    });
+  }
 
   showNotification(message: string, type: 'success' | 'info') {
     this.toastMessage = message;
@@ -81,25 +115,25 @@ export class SigninComponent {
 
     //NEW - API BASED
 
-    this.authService.signin(normalizedIdentifier,this.password)
-    .subscribe(result => {
+    this.authService.signin(normalizedIdentifier, this.password)
+      .subscribe(result => {
 
-      this.isProcessing = false;
+        this.isProcessing = false;
 
-      if (!result) return;
+        if (!result) return;
 
-      if (result.success) {
-        this.showNotification(result.message, 'success');
+        if (result.success) {
+          this.showNotification(result.message, 'success');
 
-        setTimeout(() => {
-          this.router.navigate(['/board']);
-        }, 1000);
+          setTimeout(() => {
+            this.router.navigate(['/board']);
+          }, 1000);
 
-      } else {
-        // 👈 IMPORTANT FIX
-        this.showNotification(result.message, 'info');
-      }
-    });
+        } else {
+          // 👈 IMPORTANT FIX
+          this.showNotification(result.message, 'info');
+        }
+      });
 
   }
 }

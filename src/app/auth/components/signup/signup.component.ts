@@ -1,9 +1,12 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { catchError, of, throwError } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+
+declare const google: any;
 
 @Component({
   selector: 'app-signup',
@@ -12,7 +15,7 @@ import { catchError, of, throwError } from 'rxjs';
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css'],
 })
-export class SignupComponent {
+export class SignupComponent implements AfterViewInit {
 
   name = '';
   email = '';
@@ -35,6 +38,37 @@ export class SignupComponent {
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
+
+    ngAfterViewInit() {
+    const interval = setInterval(() => {
+      if (window.google && window.google.accounts?.id) {
+        clearInterval(interval);
+
+        window.google.accounts.id.initialize({
+          client_id: environment.googleClientId,
+          callback: (response: any) => this.handleGoogleSignUp(response)
+        });
+
+        window.google.accounts.id.renderButton(
+          document.getElementById('googleSignUpBtn')!,
+          { theme: 'outline', size: 'large', width: 250 }
+        );
+      }
+    }, 100);
+  }
+
+  handleGoogleSignUp(response: any) {
+    this.isProcessing = true;
+    this.authService.verifyGoogleToken(response.credential).subscribe(result => {
+      this.isProcessing = false;
+      if (result?.success) {
+        this.showNotification('Signed up with Google!', 'success');
+        setTimeout(() => this.router.navigate(['/board']), 500);
+      } else {
+        this.showNotification(result?.message || 'Google signup failed', 'info');
+      }
+    });
+  }
 
   // ===============================
   // TOAST NOTIFICATION
