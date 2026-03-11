@@ -189,3 +189,57 @@
 .auth-switch a:hover {
   text-decoration: underline;
 }
+
+/* OR SEPARATOR */
+.or-separator {
+  text-align: center;
+  margin: 18px 0;
+  font-size: 14px;
+  color: #8a8a8a;
+  position: relative;
+}
+
+.or-separator::before,
+.or-separator::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #e0e0e0;
+}
+
+.or-separator::before {
+  left: 0;
+}
+
+.or-separator::after {
+  right: 0;
+}
+
+/* GOOGLE BUTTON CONTAINER */
+#googleSignInBtn,
+#googleSignUpBtn {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* make Google button responsive */
+#googleSignInBtn > div,
+#googleSignUpBtn > div {
+  width: 100% !important;
+  max-width: 320px;
+}
+
+/* optional hover effect */
+#googleSignInBtn iframe,
+#googleSignUpBtn iframe {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#googleSignInBtn iframe:hover,
+#googleSignUpBtn iframe:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}

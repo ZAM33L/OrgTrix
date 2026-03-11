@@ -51,7 +51,7 @@ export class SignupComponent implements AfterViewInit {
 
         window.google.accounts.id.renderButton(
           document.getElementById('googleSignUpBtn')!,
-          { theme: 'outline', size: 'large', width: 250 }
+          { theme: 'outline', size: 'large', width: 250 ,text: "signup_with"}
         );
       }
     }, 100);

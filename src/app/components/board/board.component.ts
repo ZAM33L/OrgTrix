@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, HostListener, OnInit, NgZone, ChangeDetectorRef , OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OverlayModule, ConnectedPosition } from '@angular/cdk/overlay';
@@ -13,6 +13,8 @@ import { AuthService } from '../../auth/services/auth.service';
 
 import { BoardService } from '../../services/board.service';
 
+import { PopupService } from '../../services/popup.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-board',
@@ -27,16 +29,18 @@ import { BoardService } from '../../services/board.service';
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.css']
 })
-export class BoardComponent {
+export class BoardComponent implements OnInit,OnDestroy{
 
   constructor(
     private router: Router,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private boardService: BoardService
+    private boardService: BoardService,
+    private popupService: PopupService
   ) { }
 
   currentUser: any;
+  popupSub!: Subscription;
 
   // =============================
   // INIT
@@ -53,7 +57,17 @@ export class BoardComponent {
     }
     this.currentUser = user;
     this.loadBoard();
+
+    // --- ADD THIS ---
+  this.popupSub = this.popupService.closeAllPopups$.subscribe(() => {
+    this.closeAllPopups();
+  });
   }
+
+  ngOnDestroy() {
+    this.popupSub.unsubscribe();
+  }
+
 
   boardId!: string;
 
@@ -767,7 +781,8 @@ export class BoardComponent {
 
   toggleToolbarMenu(event: MouseEvent) {
     event.stopPropagation();
-    this.closeAllPopups();
+    // this.closeAllPopups();
+    this.popupService.closeAllPopups();
     this.isToolbarMenuOpen = !this.isToolbarMenuOpen;
   }
 
@@ -1005,321 +1020,321 @@ export class BoardComponent {
   }
 
 
-  // =============================
-  // PROFILE MODALS
-  // =============================
+  // // =============================
+  // // PROFILE MODALS
+  // // =============================
 
-  showViewProfileModal = false;
-  showEditProfileModal = false;
-  showDeleteProfileModal = false;
+  // showViewProfileModal = false;
+  // showEditProfileModal = false;
+  // showDeleteProfileModal = false;
 
-  // USER FIELDS
-  name = '';
-  email = '';
-  password = '';
-  confirmPassword = '';
-  officeId = '';
+  // // USER FIELDS
+  // name = '';
+  // email = '';
+  // password = '';
+  // confirmPassword = '';
+  // officeId = '';
 
-  attemptedProfileSubmit = false;
-  isProcessing = false;
+  // attemptedProfileSubmit = false;
+  // isProcessing = false;
 
-  showProfilePopup = false;
+  // showProfilePopup = false;
 
   closeAllPopups() {
     this.isToolbarMenuOpen = false;
-    this.showProfilePopup = false;
+    // this.showProfilePopup = false;
     this.showSprintSummaryModal = false;
   }
 
-  toggleProfilePopup(event: MouseEvent) {
-    event.stopPropagation();
-    this.closeAllPopups();
+  // toggleProfilePopup(event: MouseEvent) {
+  //   event.stopPropagation();
+  //   this.closeAllPopups();
 
-    this.currentUser = this.authService.getCurrentUser();
+  //   this.currentUser = this.authService.getCurrentUser();
 
-    this.showProfilePopup = !this.showProfilePopup;
-  }
+  //   this.showProfilePopup = !this.showProfilePopup;
+  // }
 
-  closeProfilePopup() {
-    this.showProfilePopup = false;
-  }
+  // closeProfilePopup() {
+  //   this.showProfilePopup = false;
+  // }
 
 
-  // =============================
-  // OPEN VIEW PROFILE
-  // =============================
+  // // =============================
+  // // OPEN VIEW PROFILE
+  // // =============================
 
-  openViewProfile() {
+  // openViewProfile() {
 
-    const user = this.authService.getCurrentUser();
+  //   const user = this.authService.getCurrentUser();
 
-    if (!user) {
-      console.log('No user found');
-      return;
-    }
+  //   if (!user) {
+  //     console.log('No user found');
+  //     return;
+  //   }
 
-    this.name = user.name;
-    this.email = user.email;
-    this.officeId = user.officeId;
+  //   this.name = user.name;
+  //   this.email = user.email;
+  //   this.officeId = user.officeId;
 
-    this.showViewProfileModal = true;
-  }
+  //   this.showViewProfileModal = true;
+  // }
 
-  // =============================
-  // CLOSE VIEW PROFILE
-  // =============================
+  // // =============================
+  // // CLOSE VIEW PROFILE
+  // // =============================
 
-  closeViewProfile() {
-    this.showViewProfileModal = false;
-  }
+  // closeViewProfile() {
+  //   this.showViewProfileModal = false;
+  // }
 
-  // =============================
-  // GO TO EDIT PROFILE
-  // =============================
+  // // =============================
+  // // GO TO EDIT PROFILE
+  // // =============================
 
-  goToEditProfile() {
+  // goToEditProfile() {
 
-    this.showViewProfileModal = false;
+  //   this.showViewProfileModal = false;
 
-    const user = this.authService.getCurrentUser();
+  //   const user = this.authService.getCurrentUser();
 
-    if (!user) return;
+  //   if (!user) return;
 
-    this.name = user.name;
-    this.email = user.email;
-    this.officeId = user.officeId;
+  //   this.name = user.name;
+  //   this.email = user.email;
+  //   this.officeId = user.officeId;
 
-    this.password = '';
-    this.confirmPassword = '';
+  //   this.password = '';
+  //   this.confirmPassword = '';
 
-    this.showEditProfileModal = true;
-  }
+  //   this.showEditProfileModal = true;
+  // }
 
-  // =============================
-  // BACK TO VIEW PROFILE
-  // =============================
+  // // =============================
+  // // BACK TO VIEW PROFILE
+  // // =============================
 
-  backToViewProfile() {
+  // backToViewProfile() {
 
-    this.showEditProfileModal = false;
+  //   this.showEditProfileModal = false;
 
-    this.openViewProfile();
-  }
+  //   this.openViewProfile();
+  // }
 
 
-  //edit profile
+  // //edit profile
 
-  openEditProfile() {
-    const user = this.authService.getCurrentUser();
+  // openEditProfile() {
+  //   const user = this.authService.getCurrentUser();
 
-    if (!user) {
-      console.log('No user found');
-      return;
-    }
+  //   if (!user) {
+  //     console.log('No user found');
+  //     return;
+  //   }
 
-    this.name = user.name;
-    this.email = user.email;
-    this.officeId = user.officeId;
-    this.password = '';
-    this.confirmPassword = '';
+  //   this.name = user.name;
+  //   this.email = user.email;
+  //   this.officeId = user.officeId;
+  //   this.password = '';
+  //   this.confirmPassword = '';
 
-    this.showEditProfileModal = true;
-  }
+  //   this.showEditProfileModal = true;
+  // }
 
-  closeEditProfile() {
-    this.showEditProfileModal = false;
-    this.attemptedProfileSubmit = false;
-  }
+  // closeEditProfile() {
+  //   this.showEditProfileModal = false;
+  //   this.attemptedProfileSubmit = false;
+  // }
 
-  isValidEmail(): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(this.email);
-  }
+  // isValidEmail(): boolean {
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   return emailRegex.test(this.email);
+  // }
 
-  isValidPassword(): boolean {
-    return this.password.length >= 8;
-  }
+  // isValidPassword(): boolean {
+  //   return this.password.length >= 8;
+  // }
 
-  passwordsMatch(): boolean {
-    return this.password === this.confirmPassword;
-  }
+  // passwordsMatch(): boolean {
+  //   return this.password === this.confirmPassword;
+  // }
 
-  isValidOfficeId(): boolean {
-    const officeRegex = /^OT\d{6}$/;
-    return officeRegex.test(this.officeId);
-  }
+  // isValidOfficeId(): boolean {
+  //   const officeRegex = /^OT\d{6}$/;
+  //   return officeRegex.test(this.officeId);
+  // }
 
-  updateProfile() {
+  // updateProfile() {
 
-    this.attemptedProfileSubmit = true;
+  //   this.attemptedProfileSubmit = true;
 
-    this.name = this.name.trim();
-    this.email = this.email.trim();
-    this.officeId = this.officeId.trim().toUpperCase();
+  //   this.name = this.name.trim();
+  //   this.email = this.email.trim();
+  //   this.officeId = this.officeId.trim().toUpperCase();
 
-    if (!this.name || !this.email || !this.officeId) return;
+  //   if (!this.name || !this.email || !this.officeId) return;
 
-    if (!this.isValidEmail()) return;
+  //   if (!this.isValidEmail()) return;
 
-    if (this.password && !this.isValidPassword()) return;
+  //   if (this.password && !this.isValidPassword()) return;
 
-    if (this.password && !this.passwordsMatch()) return;
+  //   if (this.password && !this.passwordsMatch()) return;
 
-    if (!this.isValidOfficeId()) return;
+  //   if (!this.isValidOfficeId()) return;
 
-    const currentUser = this.authService.getCurrentUser();
+  //   const currentUser = this.authService.getCurrentUser();
 
-    if (!currentUser) {
-      this.showNotification('User not found. Please login again.', 'info');
-      return;
-    }
+  //   if (!currentUser) {
+  //     this.showNotification('User not found. Please login again.', 'info');
+  //     return;
+  //   }
 
-    // Prevent using current password again
-    if (this.password && this.password === currentUser.password) {
-      this.showNotification('New password cannot be same as current password', 'info');
-      return;
-    }
+  //   // Prevent using current password again
+  //   if (this.password && this.password === currentUser.password) {
+  //     this.showNotification('New password cannot be same as current password', 'info');
+  //     return;
+  //   }
 
-    // Prevent using previous password
-    if (
-      this.password &&
-      currentUser.passwordHistory &&
-      currentUser.passwordHistory.includes(this.password)
-    ) {
-      this.showNotification('You cannot reuse your previous password', 'info');
-      return;
-    }
+  //   // Prevent using previous password
+  //   if (
+  //     this.password &&
+  //     currentUser.passwordHistory &&
+  //     currentUser.passwordHistory.includes(this.password)
+  //   ) {
+  //     this.showNotification('You cannot reuse your previous password', 'info');
+  //     return;
+  //   }
 
-    const updatedUser = {
-      ...currentUser,
-      name: this.name,
-      email: this.email,
-      officeId: this.officeId,
-      password: this.password ? this.password : currentUser.password,
-      passwordHistory: this.password
-        ? [currentUser.password, ...(currentUser.passwordHistory || [])]
-        : currentUser.passwordHistory
-    };
+  //   const updatedUser = {
+  //     ...currentUser,
+  //     name: this.name,
+  //     email: this.email,
+  //     officeId: this.officeId,
+  //     password: this.password ? this.password : currentUser.password,
+  //     passwordHistory: this.password
+  //       ? [currentUser.password, ...(currentUser.passwordHistory || [])]
+  //       : currentUser.passwordHistory
+  //   };
 
-    this.isProcessing = true;
+  //   this.isProcessing = true;
 
-    this.authService.updateProfile(updatedUser).subscribe({
+  //   this.authService.updateProfile(updatedUser).subscribe({
 
-      next: (result) => {
+  //     next: (result) => {
 
-        this.isProcessing = false;
-
-        if (result?.success) {
-
-          // refresh current user from service
-          this.currentUser = this.authService.getCurrentUser();
-
-          this.showNotification('Profile updated successfully', 'success');
-
-          this.closeEditProfile();
-
-          this.cdr.detectChanges();
-
-        } else {
-          this.showNotification(result?.message || 'Update failed', 'info');
-        }
-      },
-
-      error: () => {
-
-        this.isProcessing = false;
-
-        this.showNotification('Something went wrong', 'info');
-      }
-
-    });
-
-  }
-
-  // ===============================
-  // DELETE PROFILE FLOW
-  // ===============================
-
-  // Modal state variables
-  showDeleteProfileConfirm = false;
-  showPasswordConfirm = false;
-  deletePassword = '';
-  attemptedDeleteProfile = false;
-
-  // Open the initial delete confirmation modal
-  openDeleteProfileConfirm() {
-    this.showDeleteProfileConfirm = true;
-  }
-
-  // Close the initial delete confirmation modal
-  closeDeleteProfileConfirm() {
-    this.showDeleteProfileConfirm = false;
-  }
-
-  // Proceed to password confirmation modal
-  proceedToPasswordConfirm() {
-    this.showDeleteProfileConfirm = false; // close delete modal
-    this.showPasswordConfirm = true;
-    this.deletePassword = '';
-    this.attemptedDeleteProfile = false;
-  }
-
-  // Close the password confirmation modal
-  closePasswordConfirm() {
-    this.showPasswordConfirm = false;
-    this.deletePassword = '';
-    this.attemptedDeleteProfile = false;
-  }
-
-  // ===============================
-  // CONFIRM DELETE WITH PASSWORD
-  // ===============================
-  confirmDeleteWithPassword() {
-    this.attemptedDeleteProfile = true;
-
-    if (!this.deletePassword) return;
-
-    const currentUser = this.authService.getCurrentUser();
-
-    if (!currentUser) {
-      this.showNotification('User not found. Please login again.', 'info');
-      return;
-    }
-
-    // Verify password
-    if (this.deletePassword !== currentUser.password) {
-      this.showNotification('Incorrect password. Deletion cancelled.', 'info');
-      return;
-    }
-
-    // Step 1: Delete all boards of this user
-    this.boardService.deleteBoardsByUser(currentUser.id).subscribe({
-      next: () => {
-        console.log('All boards deleted for user:', currentUser.id);
-
-        // Step 2: Delete the user
-        this.authService.deleteProfile(currentUser.id).subscribe({
-          next: (result) => {
-            if (result.success) {
-              this.showPasswordConfirm = false;
-              this.showNotification('Your profile and all boards have been deleted.', 'success');
-              this.router.navigate(['/signin']);
-            } else {
-              this.showNotification(result?.message || 'Profile deletion failed', 'info');
-            }
-          },
-          error: (err) => {
-            console.error('Error deleting profile:', err);
-            this.showNotification('Failed to delete profile', 'info');
-          }
-        });
-      },
-      error: (err) => {
-        console.error('Error deleting boards:', err);
-        this.showNotification('Failed to delete user boards', 'info');
-      }
-    });
-  }
+  //       this.isProcessing = false;
+
+  //       if (result?.success) {
+
+  //         // refresh current user from service
+  //         this.currentUser = this.authService.getCurrentUser();
+
+  //         this.showNotification('Profile updated successfully', 'success');
+
+  //         this.closeEditProfile();
+
+  //         this.cdr.detectChanges();
+
+  //       } else {
+  //         this.showNotification(result?.message || 'Update failed', 'info');
+  //       }
+  //     },
+
+  //     error: () => {
+
+  //       this.isProcessing = false;
+
+  //       this.showNotification('Something went wrong', 'info');
+  //     }
+
+  //   });
+
+  // }
+
+  // // ===============================
+  // // DELETE PROFILE FLOW
+  // // ===============================
+
+  // // Modal state variables
+  // showDeleteProfileConfirm = false;
+  // showPasswordConfirm = false;
+  // deletePassword = '';
+  // attemptedDeleteProfile = false;
+
+  // // Open the initial delete confirmation modal
+  // openDeleteProfileConfirm() {
+  //   this.showDeleteProfileConfirm = true;
+  // }
+
+  // // Close the initial delete confirmation modal
+  // closeDeleteProfileConfirm() {
+  //   this.showDeleteProfileConfirm = false;
+  // }
+
+  // // Proceed to password confirmation modal
+  // proceedToPasswordConfirm() {
+  //   this.showDeleteProfileConfirm = false; // close delete modal
+  //   this.showPasswordConfirm = true;
+  //   this.deletePassword = '';
+  //   this.attemptedDeleteProfile = false;
+  // }
+
+  // // Close the password confirmation modal
+  // closePasswordConfirm() {
+  //   this.showPasswordConfirm = false;
+  //   this.deletePassword = '';
+  //   this.attemptedDeleteProfile = false;
+  // }
+
+  // // ===============================
+  // // CONFIRM DELETE WITH PASSWORD
+  // // ===============================
+  // confirmDeleteWithPassword() {
+  //   this.attemptedDeleteProfile = true;
+
+  //   if (!this.deletePassword) return;
+
+  //   const currentUser = this.authService.getCurrentUser();
+
+  //   if (!currentUser) {
+  //     this.showNotification('User not found. Please login again.', 'info');
+  //     return;
+  //   }
+
+  //   // Verify password
+  //   if (this.deletePassword !== currentUser.password) {
+  //     this.showNotification('Incorrect password. Deletion cancelled.', 'info');
+  //     return;
+  //   }
+
+  //   // Step 1: Delete all boards of this user
+  //   this.boardService.deleteBoardsByUser(currentUser.id).subscribe({
+  //     next: () => {
+  //       console.log('All boards deleted for user:', currentUser.id);
+
+  //       // Step 2: Delete the user
+  //       this.authService.deleteProfile(currentUser.id).subscribe({
+  //         next: (result) => {
+  //           if (result.success) {
+  //             this.showPasswordConfirm = false;
+  //             this.showNotification('Your profile and all boards have been deleted.', 'success');
+  //             this.router.navigate(['/signin']);
+  //           } else {
+  //             this.showNotification(result?.message || 'Profile deletion failed', 'info');
+  //           }
+  //         },
+  //         error: (err) => {
+  //           console.error('Error deleting profile:', err);
+  //           this.showNotification('Failed to delete profile', 'info');
+  //         }
+  //       });
+  //     },
+  //     error: (err) => {
+  //       console.error('Error deleting boards:', err);
+  //       this.showNotification('Failed to delete user boards', 'info');
+  //     }
+  //   });
+  // }
 
   // sprint progress
   sprintProgressPercent: number = 0;
@@ -1565,7 +1580,8 @@ export class BoardComponent {
   toggleSprintSummary(event: MouseEvent) {
 
     event.stopPropagation();
-    this.closeAllPopups();
+    // this.closeAllPopups();
+    this.popupService.closeAllPopups();
     this.calculateSprintProgress();
     this.calculateOverdueTasks();
 
@@ -1577,21 +1593,11 @@ export class BoardComponent {
     this.showSprintSummaryModal = !this.showSprintSummaryModal;
 
   }
-  isAnyModalOpen(): boolean {
-    return (
-      this.showEditProfileModal ||
-      this.showViewProfileModal ||
-      this.showDeleteProfileModal
-    );
-  }
+  
 
   @HostListener('document:click')
   handleOutsideClick() {
-
-    if (this.isAnyModalOpen()) return;
-
     this.showSprintSummaryModal = false;
-    this.showProfilePopup = false;
     this.isToolbarMenuOpen = false;
   }
 

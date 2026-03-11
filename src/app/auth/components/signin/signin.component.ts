@@ -47,7 +47,7 @@ export class SigninComponent implements AfterViewInit {
 
         window.google.accounts.id.renderButton(
           document.getElementById('googleSignInBtn')!,
-          { theme: 'outline', size: 'large', width: 250 }
+          { theme: 'outline', size: 'large', width: 250 ,text: "continue_with"}
         );
       }
     }, 100);

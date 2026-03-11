@@ -155,7 +155,7 @@ body {
   align-items: center;
 
   padding: 20px;
-  z-index: 1000;
+  z-index: 3000;
 }
 
 
@@ -175,6 +175,7 @@ body {
 
   max-height: 90vh;
   overflow-y: auto;
+  z-index: 3100;
 }
 
 @media (max-width: 480px) {

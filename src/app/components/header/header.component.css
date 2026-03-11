@@ -16,7 +16,7 @@
 
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 2000;
 }
 
 .app-header h1 {
@@ -225,4 +225,136 @@
   justify-content: center;
   gap: 5px;
   cursor: pointer;
+}
+
+/* ===================================== */
+/* MODAL BACKDROP */
+/* ===================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+  z-index: 3000;
+}
+
+/* ===================================== */
+/* MODAL CONTAINER */
+/* ===================================== */
+
+.modal,
+.modal-box {
+  width: 100%;
+  max-width: 450px;
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 3100;
+}
+
+@media (max-width: 480px) {
+  .modal,
+  .modal-box {
+    max-width: 100%;
+    border-radius: 12px;
+  }
+}
+
+/* ===================================== */
+/* MODAL FORM STYLING */
+/* ===================================== */
+
+.modal input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-actions button:first-child {
+  background: #667eea;
+  color: white;
+}
+
+.modal-actions button:nth-child(2) {
+  background: #eb2828;
+  color: white;
+}
+
+/* Custom danger / cancel buttons used in delete & password modals */
+.cancel-btn {
+  background: #eee;
+}
+
+.danger-btn {
+  background: #ff4b2b;
+  color: white;
+}
+
+.error-msg {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.invalid {
+  border: 1px solid #e74c3c !important;
+}
+
+/* ===================================== */
+/* MODAL HEADER / ICONS */
+/* ===================================== */
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+.modal-icon {
+  font-size: 28px;
+  color: #ff9800;
+}
+
+/* Danger modal adjustments */
+.danger-btn:hover {
+  background-color: #c62828;
+}
+
+/* Material icons */
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
 }
