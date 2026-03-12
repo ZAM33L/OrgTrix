@@ -29,6 +29,9 @@ export class ColumnComponent {
   @Input() showAddButton = false;
   @Input() showDeleteAll = false;
 
+  @Input() showOnlyOverdue = false;
+  @Input() showOnlySprintTasks: boolean = false;
+
 
   @Input() columnId!: string;
   @Input() connectedTo: string[] = [];
@@ -200,6 +203,52 @@ export class ColumnComponent {
       task => task.priority === this.selectedPriority
     );
   }
+
+  //overdue check
+
+  isTaskOverdue(task: any): boolean {
+  if (!task.dueDate) return false;
+
+  const today = new Date();
+  const due = new Date(task.dueDate);
+
+  today.setHours(0,0,0,0);
+  due.setHours(0,0,0,0);
+
+  return due < today;
+
+  
+  
+}
+//sprint check
+workingDays: number[] = [1, 2, 3, 4, 5];
+
+isTaskInSprintWeek(task: any): boolean {
+
+  if (!task.dueDate) return false;
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const currentDay = today.getDay();
+
+  const firstWorkDay = this.workingDays[0];
+  const lastWorkDay = this.workingDays[this.workingDays.length - 1];
+
+  // sprint start
+  const startOfSprint = new Date(today);
+  startOfSprint.setDate(today.getDate() - (currentDay - firstWorkDay));
+  startOfSprint.setHours(0,0,0,0);
+
+  // sprint end
+  const endOfSprint = new Date(startOfSprint);
+  endOfSprint.setDate(startOfSprint.getDate() + (lastWorkDay - firstWorkDay));
+  endOfSprint.setHours(23,59,59,999);
+
+  const due = new Date(task.dueDate);
+
+  return due >= startOfSprint && due <= endOfSprint;
+}
 
 
 }

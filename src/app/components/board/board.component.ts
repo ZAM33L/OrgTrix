@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, NgZone, ChangeDetectorRef , OnDestroy } from '@angular/core';
+import { Component, HostListener, OnInit, NgZone, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OverlayModule, ConnectedPosition } from '@angular/cdk/overlay';
@@ -29,7 +29,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.css']
 })
-export class BoardComponent implements OnInit,OnDestroy{
+export class BoardComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
@@ -59,9 +59,9 @@ export class BoardComponent implements OnInit,OnDestroy{
     this.loadBoard();
 
     // --- ADD THIS ---
-  this.popupSub = this.popupService.closeAllPopups$.subscribe(() => {
-    this.closeAllPopups();
-  });
+    this.popupSub = this.popupService.closeAllPopups$.subscribe(() => {
+      this.closeAllPopups();
+    });
   }
 
   ngOnDestroy() {
@@ -1431,6 +1431,20 @@ export class BoardComponent implements OnInit,OnDestroy{
     this.overdueTasksCount = overdue;
   }
 
+  //overdue filter
+  showOnlyOverdue: boolean = false;
+
+  toggleOverdueFilter() {
+    if (!this.showOnlyOverdue) {
+      this.showOnlySprintTasks = false;
+    }
+    this.showOnlyOverdue = !this.showOnlyOverdue;
+    console.log("OVERDUE FILTER CALLED")
+
+  }
+
+
+
   //sprint summary
   showSprintSummaryModal = false;
 
@@ -1593,7 +1607,18 @@ export class BoardComponent implements OnInit,OnDestroy{
     this.showSprintSummaryModal = !this.showSprintSummaryModal;
 
   }
-  
+
+  // sprint filter
+  showOnlySprintTasks: boolean = false;
+
+  toggleSprintFilter() {
+    if (!this.showOnlySprintTasks) {
+      this.showOnlyOverdue = false;
+    }
+    this.showOnlySprintTasks = !this.showOnlySprintTasks;
+    console.log("SPRINT FILTER CALLED")
+  }
+
 
   @HostListener('document:click')
   handleOutsideClick() {

@@ -750,6 +750,36 @@ input[type="date"] {
 }
 
 /* sprint progress */
+/* ================= SPRINT FILTER ================= */
+
+.sprint-label {
+  padding: 4px 10px;
+  border-radius: 6px;
+
+  background: #e3f2fd;
+  color: #1565c0;
+
+  font-weight: 500;
+
+  transition: all 0.25s ease;
+}
+
+.sprint-label:hover {
+  background: #d6ecff;
+}
+
+.sprint-label.active {
+  background: #1976d2;
+  color: white;
+
+  box-shadow: 0 3px 10px rgba(25,118,210,0.35);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+
 .sprint-progress-wrapper{
   position: relative;
   display: inline-block;
@@ -799,18 +829,51 @@ input[type="date"] {
 
 /* tasks overdue */
 
+/* ================= OVERDUE FILTER ================= */
+
 .overdue-tasks {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  margin-left: 16px;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 12px;
+
+  background: #ffe5e5;
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  transition: all 0.25s ease;
+
+  cursor: pointer;
+}
+
+.overdue-tasks:hover {
+  background:#ffd6d6;
+  transform: translateY(-1px);
 }
 
 .overdue-count {
-  font-size: 13px;
-  font-weight: 500;
-  color: #ef4444;
+  font-weight: 600;
+}
+
+.overdue-text {
+  margin-left: 4px;
+  opacity: 0.8;
+}
+
+/* ACTIVE FILTER */
+
+.overdue-tasks.active {
+  background: #e53935;
+  color: white;
+
+  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.35);
+}
+
+.overdue-tasks.active .overdue-text {
+  opacity: 1;
 }
 
 @media (max-width: 768px) {

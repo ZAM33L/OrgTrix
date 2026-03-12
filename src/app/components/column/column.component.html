@@ -126,11 +126,19 @@
     </div>
     }
     @for (task of filteredTasks; track task.id) {
-    <div cdkDrag>
-      <app-task [task]="task" (edit)="onEdit($event)" (delete)="onDelete($event)">
-      </app-task>
-    </div>
-    }
+@if ((!showOnlyOverdue || isTaskOverdue(task))  &&
+  (!showOnlySprintTasks || isTaskInSprintWeek(task))) {
+
+  <div cdkDrag>
+    <app-task
+      [task]="task"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)">
+    </app-task>
+  </div>
+
+}
+}
   </div>
 
   @if (showAddButton && columnId === 'todo') {
