@@ -438,4 +438,38 @@ export class DashboardComponent implements OnInit {
 
   }
 
+  //column analytics
+
+  // max tasks among all columns
+getMaxColumnCount(): number {
+  if (!this.columnStats.length) return 1;
+  return Math.max(...this.columnStats.map(c => c.count));
+}
+
+// get column width %
+getColumnPercentage(count: number): number {
+  if (this.totalTasks === 0) return 0; // avoid division by zero
+  return (count / this.totalTasks) * 100;
+}
+
+// optional: assign color per column
+getColumnColor(columnId: string): string {
+  const col = this.columns.find(c => c.id === columnId);
+  return col?.color || '#9ca3af'; // fallback gray if no color
+}
+
+//priority oveerview
+
+// convert count into percentage of circle (circumference = 100)
+getDonutSegment(count: number): string {
+  const total = this.totalTasks || 1;
+  const percentage = (count / total) * 100;
+  return `${percentage} ${100 - percentage}`;
+}
+
+// calculate offset for stacking segments
+getDonutOffset(offsetCount: number): number {
+  const total = this.totalTasks || 1;
+  return 100 - (offsetCount / total) * 100;
+}
 }

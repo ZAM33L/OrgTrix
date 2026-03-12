@@ -31,6 +31,128 @@
   width: 100%;
 }
 
+/* ===================== TASK SUMMARY CARD ===================== */
+
+.task-summary-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* wrapper */
+
+.task-summary-wrapper {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* individual item */
+
+.task-summary-item {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  column-gap: 10px;
+  padding: 10px 12px;
+
+  background: #fafafa;
+  border-radius: 8px;
+
+  border-left: 4px solid transparent;
+  transition: all 0.2s ease;
+}
+
+/* hover */
+
+.task-summary-item:hover {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}
+
+/* icon */
+
+.stat-icon {
+  width: 28px;
+  font-size: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* text container */
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+/* label */
+
+.stat-title {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* value */
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* ===================== COLORS ===================== */
+
+.total { color: #6366f1; }
+.done { color: #22c55e; }
+.pending { color: #f59e0b; }
+.completed { color: #10b981; }
+.delivered { color: #3b82f6; }
+
+/* border colors */
+
+.task-summary-item.total {
+  border-left-color: #6366f1;
+}
+
+.task-summary-item.done {
+  border-left-color: #22c55e;
+}
+
+.task-summary-item.pending {
+  border-left-color: #f59e0b;
+}
+
+.task-summary-item.completed {
+  border-left-color: #10b981;
+}
+
+.task-summary-item.delivered {
+  border-left-color: #3b82f6;
+}
+
+/* ===================== MOBILE ===================== */
+
+@media (max-width: 768px) {
+
+  .task-summary-wrapper {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+}
+
+/* very small phones */
+
+@media (max-width: 420px) {
+
+  .task-summary-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+}
 /* ===================== STAT CARDS ===================== */
 .stat-card {
   background: white;
@@ -334,4 +456,161 @@
     flex-direction: row;
     gap: 8px;
   }
+}
+
+/*column analytlics*/
+
+.card-columns {
+  display: flex;
+  flex-direction: column;
+}
+
+.column-analytics {                /* take remaining card height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* vertical centering */
+  gap: 10px;
+}
+
+.column-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.column-title {
+  width: 100px; /* fixed width for labels */
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.column-bar {
+  flex: 1;
+  height: 16px;
+  background: #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.column-fill {
+  height: 100%;
+  border-radius: 8px 0 0 8px;
+  transition: width 0.3s ease;
+}
+
+.column-count {
+  width: 32px;
+  font-size: 13px;
+  text-align: right;
+  color: #111827;
+}
+
+/*priority overview*/
+
+.card-priority {
+  display: flex;
+  flex-direction: column;
+}
+
+.priority-donut-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.donut {
+  width: 120px;
+  height: 120px;
+  /* transform: rotate(-90deg);  <- removed, slices rotated individually */
+}
+
+.donut-segment {
+  stroke-linecap: butt;
+  transition: stroke-dasharray 0.3s ease, stroke-dashoffset 0.3s ease;
+}
+
+.donut-text {
+  font-size: 12px;
+  font-weight: 600;
+  fill: #111827;
+}
+
+.priority-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.priority-labels .label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.priority-labels .high { color: #ff4d4f; }
+.priority-labels .medium { color: #faad14; }
+.priority-labels .low { color: #52c41a; }
+
+/*wrapper*/
+/* Flex wrapper for two cards */
+
+/* Card section title spacing */
+.stat-card .section-title {
+   /* add space below heading */
+  font-size: 18px;     /* keep it readable */
+  font-weight: 600;
+  color: #111827;
+}
+
+.dashboard-flex-wrapper {
+  display: flex;
+  gap: 24px;           /* spacing between the cards */
+  flex-wrap: wrap;      /* wrap on smaller screens */
+  align-items: stretch; /* make cards equal height */
+  padding: 16px;        /* spacing around the cards */
+}
+
+/* Each card takes roughly half width on desktop */
+.card-priority,
+.card-columns {
+  flex: 1 1 45%;       /* grow, shrink, base width 45% */
+  min-width: 280px;    /* prevent too narrow on tablets */
+  display: flex;
+  flex-direction: column; /* allow content to stretch vertically */
+}
+
+/* Add padding inside each card */
+.stat-card {
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: 12px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* distribute content nicely */
+}
+
+/* Stack vertically on mobile */
+@media (max-width: 768px) {
+  .dashboard-flex-wrapper {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card-priority,
+  .card-columns {
+    flex: 1 1 100%;
+  }
+}
+
+.priority-donut-wrapper,
+.column-analytics {
+  padding-top: 4px;
+}
+
+.card-priority .section-title,
+.card-columns .section-title {
+  margin: 0 0 20px;
 }

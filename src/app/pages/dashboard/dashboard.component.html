@@ -84,73 +84,140 @@
     </div>
 
   </div>
-
   <!-- ===================== TASK SUMMARY ===================== -->
-  <div class="dashboard-grid">
-    <div class="stat-card">
-      <div class="stat-title">Total Tasks</div>
-      <div class="stat-value">{{ totalTasks }}</div>
-    </div>
+  <div class="stat-card task-summary-card">
+    <h2 class="section-title">Task Summary</h2>
 
-    <div class="stat-card">
-      <div class="stat-title">Done Tasks</div>
-      <div class="stat-value">{{ doneTasks }}</div>
-    </div>
+    <div class="task-summary-wrapper">
 
-    <div class="stat-card">
-      <div class="stat-title">Pending Tasks</div>
-      <div class="stat-value">{{ pendingTasks }}</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-title">Completed</div>
-      <div class="stat-value">{{ completedTasks }}</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-title">Delivered</div>
-      <div class="stat-value">{{ deliveredTasks }}</div>
-    </div>
-  </div>
-
-  <!-- ===================== PRIORITY OVERVIEW ===================== -->
-  <h2 class="section-title">Priority Overview</h2>
-  <div class="dashboard-grid">
-    <div class="stat-card high">
-      <div class="stat-title">High Priority</div>
-      <div class="stat-value">{{ highPriority }}</div>
-    </div>
-
-    <div class="stat-card medium">
-      <div class="stat-title">Medium Priority</div>
-      <div class="stat-value">{{ mediumPriority }}</div>
-    </div>
-
-    <div class="stat-card low">
-      <div class="stat-title">Low Priority</div>
-      <div class="stat-value">{{ lowPriority }}</div>
-    </div>
-  </div>
-
-  <!-- ===================== COLUMN ANALYTICS ===================== -->
-  <h2 class="section-title">Column Analytics</h2>
-  <div class="dashboard-grid">
-    @for (column of columnStats; track column.id) {
-      <div class="stat-card">
-        <div class="stat-title">{{ column.title }}</div>
-        <div class="stat-value">{{ column.count }}</div>
+      <div class="task-summary-item total">
+        <span class="material-icons stat-icon total">assignment</span>
+        <div class="stat-info">
+          <div class="stat-title">Total Tasks</div>
+          <div class="stat-value">{{ totalTasks }}</div>
+        </div>
       </div>
-    }
-  </div>
 
+      <div class="task-summary-item done">
+        <span class="material-icons stat-icon done">check_circle</span>
+        <div class="stat-info">
+          <div class="stat-title">Done Tasks</div>
+          <div class="stat-value">{{ doneTasks }}</div>
+        </div>
+      </div>
+
+      <div class="task-summary-item pending">
+        <span class="material-icons stat-icon pending">schedule</span>
+        <div class="stat-info">
+          <div class="stat-title">Pending</div>
+          <div class="stat-value">{{ pendingTasks }}</div>
+        </div>
+      </div>
+
+      <div class="task-summary-item completed">
+        <span class="material-icons stat-icon completed">task_alt</span>
+        <div class="stat-info">
+          <div class="stat-title">Completed</div>
+          <div class="stat-value">{{ completedTasks }}</div>
+        </div>
+      </div>
+
+      <div class="task-summary-item delivered">
+        <span class="material-icons stat-icon delivered">local_shipping</span>
+        <div class="stat-info">
+          <div class="stat-title">Delivered</div>
+          <div class="stat-value">{{ deliveredTasks }}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- column analytics and priority -->
+  <div class="dashboard-flex-wrapper">
+
+    <!-- Priority Overview Card -->
+    <div class="stat-card card-priority">
+
+      <h2 class="section-title">Priority Overview</h2>
+
+      <div class="card-content">
+        <div class="priority-donut-wrapper">
+          <svg viewBox="0 0 42 42" class="donut">
+
+            <circle class="donut-bg" cx="21" cy="21" r="15.9" fill="transparent" stroke="#e5e7eb" stroke-width="8">
+            </circle>
+
+            <circle class="donut-segment high" cx="21" cy="21" r="15.9" fill="transparent" stroke="#ff4d4f"
+              stroke-width="8" [attr.stroke-dasharray]="getDonutSegment(highPriority)" [attr.stroke-dashoffset]="0"
+              transform="rotate(-90 21 21)">
+            </circle>
+
+            <circle class="donut-segment medium" cx="21" cy="21" r="15.9" fill="transparent" stroke="#faad14"
+              stroke-width="8" [attr.stroke-dasharray]="getDonutSegment(mediumPriority)"
+              [attr.stroke-dashoffset]="getDonutOffset(highPriority)" transform="rotate(-90 21 21)">
+            </circle>
+
+            <circle class="donut-segment low" cx="21" cy="21" r="15.9" fill="transparent" stroke="#52c41a"
+              stroke-width="8" [attr.stroke-dasharray]="getDonutSegment(lowPriority)"
+              [attr.stroke-dashoffset]="getDonutOffset(highPriority + mediumPriority)" transform="rotate(-90 21 21)">
+            </circle>
+
+            <text x="21" y="21" text-anchor="middle" dominant-baseline="middle" class="donut-text">
+              {{ totalTasks }}
+            </text>
+
+          </svg>
+
+          <div class="priority-labels">
+            <div class="label high">High: {{ highPriority }}</div>
+            <div class="label medium">Medium: {{ mediumPriority }}</div>
+            <div class="label low">Low: {{ lowPriority }}</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- Column Analytics Card -->
+    <div class="stat-card card-columns">
+
+      <h2 class="section-title">Column Analytics</h2>
+
+      <div class="card-content">
+        <div class="column-analytics">
+
+          @for (column of columnStats; track column.id) {
+          <div class="column-bar-wrapper">
+
+            <span class="column-title">{{ column.title }}</span>
+
+            <div class="column-bar">
+              <div class="column-fill" [style.width.%]="getColumnPercentage(column.count)"
+                [style.background]="getColumnColor(column.id)">
+              </div>
+            </div>
+
+            <span class="column-count">{{ column.count }} / {{ totalTasks }}</span>
+
+          </div>
+          }
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
   <!-- ===================== RECENT TASKS ===================== -->
   <h2 class="section-title">Recent Tasks</h2>
   <div class="recent-tasks">
     @for (task of recentTasks; track task.id) {
-      <div class="task-card">
-        <div class="task-title">{{ task.title }}</div>
-        <div class="task-meta">Priority: {{ task.priority }}</div>
-      </div>
+    <div class="task-card">
+      <div class="task-title">{{ task.title }}</div>
+      <div class="task-meta">Priority: {{ task.priority }}</div>
+    </div>
     }
   </div>
 

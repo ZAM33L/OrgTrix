@@ -50,6 +50,21 @@
           "color": "yellow",
           "tasks": [
             {
+              "id": 1773296081252,
+              "title": "day 10",
+              "description": "do work",
+              "priority": "Medium",
+              "dueDate": "2026-03-12T18:30:00.000Z",
+              "enteredDate": "2026-03-12T06:14:27.669Z"
+            }
+          ]
+        },
+        {
+          "id": "col-1773296996704",
+          "title": "In Testing",
+          "color": "pink",
+          "tasks": [
+            {
               "id": 1773067157315,
               "title": "day 8",
               "description": "do work",
@@ -79,6 +94,14 @@
           "title": "Delivered",
           "color": "blue",
           "tasks": [
+            {
+              "id": 1773296602681,
+              "title": "sprint task 5",
+              "description": "meet",
+              "priority": "High",
+              "dueDate": "2026-03-12T18:30:00.000Z",
+              "enteredDate": "2026-03-12T06:23:04.169Z"
+            },
             {
               "id": 1773067013956,
               "title": "day 9",
