@@ -180,7 +180,7 @@
     (sort)="sortColumn(column, $event)" [sortField]="column.sortField ?? undefined"
     [sortDirection]="column.sortDirection ?? undefined" (resetSort)="resetColumnSort(column)"
     (deleteColumn)="openDeleteColumnConfirm($event)" (taskMoved)="onTaskMoved()" [showOnlyOverdue]="showOnlyOverdue"
-    [showOnlySprintTasks]="showOnlySprintTasks">
+    [showOnlySprintTasks]="showOnlySprintTasks" (imageClicked)="openImageViewer($event)">
   </app-column>
   }
 
@@ -812,5 +812,18 @@
 @if (showToast) {
 <div class="toast" [ngClass]="toastType">
   {{toastMessage}}
+</div>
+}
+
+<!-- image modal -->
+ @if(imageModalOpen){
+<div class="image-modal" (click)="closeImageModal()">
+
+  <img
+    [src]="selectedImage"
+    class="fullscreen-image"
+    (click)="$event.stopPropagation()"
+  >
+
 </div>
 }

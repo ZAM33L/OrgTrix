@@ -49,19 +49,3 @@
 
 
 </div>
-
-@if(imageModalOpen){
-  <div class="image-modal">
-
-  <div class="modal-overlay" (click)="closeImageModal()"></div>
-
-  <div class="modal-content" (click)="$event.stopPropagation()">
-
-    <button class="modal-close" (click)="closeImageModal()">✕</button>
-
-    <img [src]="task.image" class="modal-image">
-
-  </div>
-
-</div>
-}

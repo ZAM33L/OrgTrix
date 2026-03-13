@@ -133,7 +133,9 @@
     <app-task
       [task]="task"
       (edit)="onEdit($event)"
-      (delete)="onDelete($event)">
+      (delete)="onDelete($event)"
+      (imageClicked)="handleImageClick($event)"
+      >
     </app-task>
   </div>
 

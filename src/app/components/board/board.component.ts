@@ -1777,6 +1777,19 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.removeImage = true;
   }
 
+  //image modal
+  imageModalOpen = false;
+selectedImage = '';
+
+openImageViewer(img: string) {
+  this.selectedImage = img;
+  this.imageModalOpen = true;
+}
+
+closeImageModal() {
+  this.imageModalOpen = false;
+}
+
 }
 
 

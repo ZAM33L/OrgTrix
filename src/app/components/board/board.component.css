@@ -165,6 +165,8 @@ body {
 
 .modal,
 .modal-box {
+  padding-right: 20px;
+
   width: 100%;
   max-width: 450px;
   background: white;
@@ -174,8 +176,24 @@ body {
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
 
   max-height: 90vh;
-  overflow-y: auto;
+  overflow-y: scroll;
+  scrollbar-width: thin; /* for Firefox */
+  scrollbar-color: rgba(0,0,0,0.2) transparent;
   z-index: 3100;
+}
+
+.modal {
+  overflow-y: overlay; /* scrollbar floats over content, corners stay rounded */
+}
+
+.modal::-webkit-scrollbar {
+  width: 8px;
+  border-radius: 12px;
+}
+
+.modal::-webkit-scrollbar-thumb {
+  border-radius: 12px;
+  background: rgba(0,0,0,0.2);
 }
 
 @media (max-width: 480px) {
@@ -1268,4 +1286,28 @@ input[type="date"] {
 
 .remove-image-btn:hover{
   background: #ffcccc;
+}
+
+/*img modal*/
+
+.image-modal{
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,0.9);
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  z-index:999999;
+}
+
+.fullscreen-image{
+  max-width:95vw;
+  max-height:95vh;
+
+  object-fit:contain;
+
+  border-radius:8px;
 }

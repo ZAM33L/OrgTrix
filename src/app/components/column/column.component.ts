@@ -53,6 +53,12 @@ export class ColumnComponent {
 
   @Output() deleteColumn = new EventEmitter<string>();
 
+  @Output() imageClicked = new EventEmitter<string>();
+
+handleImageClick(image: string) {
+  this.imageClicked.emit(image);
+}
+
   /* ========================= */
   /* MENU */
   /* ========================= */

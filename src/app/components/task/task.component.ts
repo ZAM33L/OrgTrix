@@ -15,6 +15,11 @@ export class TaskComponent {
 
   @Output() edit = new EventEmitter<Task>();
   @Output() delete = new EventEmitter<number>();
+  @Output() imageClicked = new EventEmitter<string>();
+
+openImageModal() {
+  this.imageClicked.emit(this.task.image);
+}
 
   onEdit() {
     this.edit.emit(this.task);
@@ -32,9 +37,7 @@ export class TaskComponent {
 
   imageModalOpen: boolean = false;
 
-openImageModal() {
-  this.imageModalOpen = true;
-}
+
 
 closeImageModal() {
   this.imageModalOpen = false;
