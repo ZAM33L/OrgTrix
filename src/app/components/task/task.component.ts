@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter,HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Task } from '../../models/task.model';
 
@@ -23,4 +23,33 @@ export class TaskComponent {
   onDelete() {
     this.delete.emit(this.task.id);
   }
+
+  showImage: boolean = false;
+
+  toggleImage() {
+    this.showImage = !this.showImage;
+  }
+
+  imageModalOpen: boolean = false;
+
+openImageModal() {
+  this.imageModalOpen = true;
+}
+
+closeImageModal() {
+  this.imageModalOpen = false;
+}
+
+@HostListener('document:click', ['$event'])
+handleDocumentClick(event: MouseEvent) {
+
+  if (!this.imageModalOpen) return;
+
+  const clickedInsideModal = (event.target as HTMLElement).closest('.modal-content');
+
+  if (!clickedInsideModal) {
+    this.closeImageModal();
+  }
+
+}
 }

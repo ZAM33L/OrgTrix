@@ -179,7 +179,8 @@
     [isMenuOpen]="activeMenuColumnId === column.id" (menuToggle)="toggleMenu(column.id)"
     (sort)="sortColumn(column, $event)" [sortField]="column.sortField ?? undefined"
     [sortDirection]="column.sortDirection ?? undefined" (resetSort)="resetColumnSort(column)"
-    (deleteColumn)="openDeleteColumnConfirm($event)" (taskMoved)="onTaskMoved()" [showOnlyOverdue]="showOnlyOverdue" [showOnlySprintTasks]="showOnlySprintTasks">
+    (deleteColumn)="openDeleteColumnConfirm($event)" (taskMoved)="onTaskMoved()" [showOnlyOverdue]="showOnlyOverdue"
+    [showOnlySprintTasks]="showOnlySprintTasks">
   </app-column>
   }
 
@@ -200,6 +201,22 @@
     </div>
     }
     <textarea placeholder="Description" [(ngModel)]="newTask.description"></textarea>
+
+    <h4 class="field-heading">Attachment</h4>
+
+    <input class="file-input" type="file" accept="image/*" (change)="onFileSelected($event)">
+
+    @if(imagePreview){
+    <div class="image-preview">
+      <img [src]="imagePreview">
+      <button
+    type="button"
+    class="remove-image-btn"
+    (click)="removeSelectedImage()">
+    ✕ Remove Image
+  </button>
+    </div>
+    }
     <!--priority-->
     <h4 class="field-heading">Priority</h4>
     <div class="cdk-select" cdkOverlayOrigin #addTrigger="cdkOverlayOrigin" (click)="toggleAddDropdown()">
@@ -331,7 +348,9 @@
 
     </ng-template>
     <div class="modal-actions">
-      <button (click)="addTask()">Add</button>
+      <button (click)="addTask()" [disabled]="isAdding">
+        {{ isAdding ? 'Adding...' : 'Add Task' }}
+      </button>
       <button (click)="closeAddModal()">Cancel</button>
     </div>
   </div>
@@ -352,7 +371,24 @@
       Title is required
     </div>
     }
+
     <textarea [(ngModel)]="editingTask.description"></textarea>
+
+    <h4 class="field-heading">Attachment</h4>
+
+    <input class="file-input" type="file" accept="image/*" (change)="onFileSelected($event)">
+
+    @if(imagePreview){
+    <div class="image-preview">
+      <img [src]="imagePreview">
+
+      <button type="button" class="remove-image-btn" (click)="removeTaskImage()">
+        ✕ Remove Image
+      </button>
+
+    </div>
+    }
+
     <!-- priority -->
     <h4 class="field-heading">Priority</h4>
     <div class="cdk-select" cdkOverlayOrigin #editTrigger="cdkOverlayOrigin" (click)="toggleEditDropdown()"> {{
@@ -472,7 +508,9 @@
     </ng-template>
 
     <div class="modal-actions">
-      <button (click)="updateTask()">Update</button>
+      <button (click)="updateTask()" [disabled]="isUpdating">
+        {{ isUpdating ? 'Updating...' : 'Update' }}
+      </button>
       <button (click)="closeEditModal()">Cancel</button>
     </div>
   </div>

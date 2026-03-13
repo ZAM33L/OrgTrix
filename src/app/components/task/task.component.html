@@ -11,6 +11,24 @@
 
   <p>{{ task.description }}</p>
 
+  @if(task.image){
+  <div>
+    <button class="show-image-btn" (click)="toggleImage()">
+      📎 {{ showImage ? 'Hide Image' : 'Show Image' }}
+    </button>
+    @if(showImage){
+    <div class="task-image-container">
+      <img 
+      [src]="task.image" 
+      class="task-image"
+      (click)="openImageModal();$event.stopPropagation()"
+      title="Click to view full image"
+      >
+    </div>
+    }
+  </div>
+  }
+
   @if (task.enteredDate) {
   <div class="entered-date">
     ⏱ {{ task.enteredDate | date:'mediumDate' }}
@@ -31,3 +49,19 @@
 
 
 </div>
+
+@if(imageModalOpen){
+  <div class="image-modal">
+
+  <div class="modal-overlay" (click)="closeImageModal()"></div>
+
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <button class="modal-close" (click)="closeImageModal()">✕</button>
+
+    <img [src]="task.image" class="modal-image">
+
+  </div>
+
+</div>
+}

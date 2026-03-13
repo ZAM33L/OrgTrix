@@ -16,6 +16,9 @@ import { BoardService } from '../../services/board.service';
 import { PopupService } from '../../services/popup.service';
 import { Subscription } from 'rxjs';
 
+import { HttpClient } from '@angular/common/http';
+import { Observable, forkJoin, of } from 'rxjs';
+
 @Component({
   selector: 'app-board',
   standalone: true,
@@ -36,7 +39,8 @@ export class BoardComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private boardService: BoardService,
-    private popupService: PopupService
+    private popupService: PopupService,
+    private http: HttpClient
   ) { }
 
   currentUser: any;
@@ -213,9 +217,21 @@ export class BoardComponent implements OnInit, OnDestroy {
   newTask: Task = this.createEmptyTask();
 
   openAddModal(columnId: string) {
+
     this.currentColumnId = columnId;
     this.showAddModal = true;
+
+    // reset task data
+    this.resetNewTask();
+
+    // reset image states
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.removeImage = false;
+
+    // reset UI states
     this.attemptedSubmit = false;
+    this.isAdding = false;
   }
 
   closeAddModal() {
@@ -237,7 +253,9 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.closeAddEnteredDate();
   }
 
-  addTask() {
+  isAdding = false;
+
+  async addTask() {
     this.attemptedSubmit = true;
 
     //validation
@@ -251,9 +269,22 @@ export class BoardComponent implements OnInit, OnDestroy {
       return;
     }
     const newTaskId = Date.now() + Math.floor(Math.random() * 1000);
+
+    this.isAdding = true;
+
+    // -------------------------
+    // IMAGE LOGIC
+    // -------------------------
+    let imageUrl = '';
+
+    if (this.selectedFile) {
+      imageUrl = await this.uploadImage();
+    }
+
     column.tasks.push({
       ...this.newTask,
       id: newTaskId,
+      image: imageUrl
     });
     console.log(`Task added to column "${column.title}"`, {
       ...this.newTask,
@@ -262,6 +293,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
     this.saveBoard();
     this.updateBoardStats();
+    this.isAdding = false;
     this.closeAddModal();
     this.showNotification('Task added successfully!', 'success');
   }
@@ -279,6 +311,9 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   private resetNewTask() {
     this.newTask = this.createEmptyTask();
+
+    this.selectedFile = null;
+    this.imagePreview = null;
   }
 
   // =============================
@@ -296,6 +331,10 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.editingTask = { ...task };
     this.showEditModal = true;
     this.attemptedEditSubmit = false;
+
+    this.imagePreview = task.image || null;
+    this.selectedFile = null;
+    this.removeImage = false;
   }
 
   closeEditModal() {
@@ -318,7 +357,10 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.closeEditEnteredDate();
   }
 
-  updateTask() {
+  isUpdating = false;
+
+  async updateTask() {
+
     this.attemptedEditSubmit = true;
 
     if (!this.editingTask) {
@@ -331,17 +373,46 @@ export class BoardComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.isUpdating = true;
+    // -------------------------
+    // IMAGE LOGIC
+    // -------------------------
+
+    let imageUrl = this.editingTask.image || '';
+
+    if (this.removeImage) {
+      imageUrl = '';
+    }
+
+    if (this.selectedFile) {
+      imageUrl = await this.uploadImage();
+    }
+
+    this.editingTask.image = imageUrl;
+
+    // -------------------------
+    // UPDATE TASK IN COLUMN
+    // -------------------------
+
     for (const column of this.columns) {
+
       const index = column.tasks.findIndex(t => t.id === this.editingTask!.id);
+
       if (index !== -1) {
+
         column.tasks[index] = { ...this.editingTask };
+
         console.log(`Task updated in column "${column.title}"`, this.editingTask);
+
         break;
       }
     }
+
     this.saveBoard();
     this.updateBoardStats();
+    this.isUpdating = false;
     this.closeEditModal();
+
     this.showNotification('Task updated successfully!', 'success');
   }
 
@@ -1630,6 +1701,80 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   goToDashboard() {
     this.router.navigate(['/dashboard']);
+  }
+
+  //image upload
+
+  selectedFile!: File | null;
+  imagePreview: string | null = null;
+
+  uploadedImageUrl: string = '';
+  removeImage: boolean = false;
+
+  onFileSelected(event: any) {
+
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    this.selectedFile = file;
+
+    this.removeImage = false;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+      this.cdr.detectChanges();
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  uploadImage(): Promise<string> {
+
+    return new Promise((resolve, reject) => {
+
+      if (!this.selectedFile) {
+        resolve('');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', this.selectedFile);
+
+      this.http.post<any>('http://localhost:3000/upload', formData)
+        .subscribe({
+          next: res => resolve(res.imageUrl),
+          error: err => reject(err)
+        });
+
+    });
+
+  }
+
+  //add image
+  removeSelectedImage() {
+  this.selectedFile = null;
+  this.imagePreview = null;
+
+  const fileInput = document.querySelector('.file-input') as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = '';
+  }
+}
+
+  //edit image upload
+  removeTaskImage() {
+
+    this.imagePreview = null;      // remove preview
+    this.selectedFile = null;      // clear any selected file
+
+    if (this.editingTask) {
+      this.editingTask.image = ''; // remove existing image
+    }
+
+    this.removeImage = true;
   }
 
 }

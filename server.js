@@ -7,6 +7,7 @@ const middlewares = jsonServer.defaults();
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const express = require('express');
+const multer = require('multer');
 
 // =======================
 // GOOGLE OAUTH CONFIG
@@ -19,6 +20,26 @@ server.use(middlewares);
 // server.use(bodyParser.json());
 // server.use(express.json());
 server.use(jsonServer.bodyParser);
+
+// =======================
+// IMAGE UPLOAD CONFIG
+// =======================
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = Date.now() + '-' + file.originalname;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({ storage });
+
+// serve uploaded images
+server.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // =======================
 // SIGNUP
@@ -117,6 +138,28 @@ server.post('/auth/google', async (req, res) => {
     console.error(err);
     return res.status(401).json({ success: false, message: 'Invalid Google token' });
   }
+});
+
+// =======================
+// IMAGE UPLOAD API
+// =======================
+
+server.post('/upload', upload.single('image'), (req, res) => {
+
+  if (!req.file) {
+    return res.status(400).json({
+      success:false,
+      message:'No file uploaded'
+    });
+  }
+
+  const imageUrl = `http://localhost:3000/uploads/${req.file.filename}`;
+
+  res.json({
+    success:true,
+    imageUrl:imageUrl
+  });
+
 });
 
 // =======================

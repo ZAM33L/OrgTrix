@@ -5,4 +5,5 @@ export interface Task {
     priority: 'High' | 'Medium' | 'Low';
     dueDate:Date | null;
     enteredDate:Date | null;
+    image?: string; 
 }
