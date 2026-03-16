@@ -1065,7 +1065,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   logout() {
     // Clear login status
     this.authService.signout(); // implement this in AuthService
-    this.router.navigate(['/signin']);
+    this.router.navigate(['/']);
   }
 
   // BoardComponent
@@ -1081,8 +1081,13 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   confirmLogout() {
     this.authService.signout(); // clears login
-    this.router.navigate(['/signin']);
+    this.router.navigate(['/']);
     this.showLogoutConfirm = false;
+  }
+
+  signInAnotherAccount() {
+    this.authService.signout();
+    this.router.navigate(['/signin']);
   }
 
   //ham menu
@@ -1755,14 +1760,14 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   //add image
   removeSelectedImage() {
-  this.selectedFile = null;
-  this.imagePreview = null;
+    this.selectedFile = null;
+    this.imagePreview = null;
 
-  const fileInput = document.querySelector('.file-input') as HTMLInputElement;
-  if (fileInput) {
-    fileInput.value = '';
+    const fileInput = document.querySelector('.file-input') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
-}
 
   //edit image upload
   removeTaskImage() {
@@ -1779,16 +1784,16 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   //image modal
   imageModalOpen = false;
-selectedImage = '';
+  selectedImage = '';
 
-openImageViewer(img: string) {
-  this.selectedImage = img;
-  this.imageModalOpen = true;
-}
+  openImageViewer(img: string) {
+    this.selectedImage = img;
+    this.imageModalOpen = true;
+  }
 
-closeImageModal() {
-  this.imageModalOpen = false;
-}
+  closeImageModal() {
+    this.imageModalOpen = false;
+  }
 
 }
 

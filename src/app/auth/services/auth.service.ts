@@ -197,7 +197,7 @@ export class AuthService {
   signout() {
     console.log('[AuthService] User Logged Out');
     localStorage.removeItem(this.currentUserKey);
-    this.router.navigate(['/signin']);
+    this.router.navigate(['/']);
   }
 
   //check login

@@ -158,6 +158,10 @@
         Reset Board
       </button>
 
+      <button (click)="signInAnotherAccount()">
+        Sign in with another account
+      </button>
+
       <button (click)="openLogoutConfirm(); closeToolbarMenu()">
         Sign out
       </button>
@@ -209,12 +213,9 @@
     @if(imagePreview){
     <div class="image-preview">
       <img [src]="imagePreview">
-      <button
-    type="button"
-    class="remove-image-btn"
-    (click)="removeSelectedImage()">
-    ✕ Remove Image
-  </button>
+      <button type="button" class="remove-image-btn" (click)="removeSelectedImage()">
+        ✕ Remove Image
+      </button>
     </div>
     }
     <!--priority-->
@@ -816,14 +817,10 @@
 }
 
 <!-- image modal -->
- @if(imageModalOpen){
+@if(imageModalOpen){
 <div class="image-modal" (click)="closeImageModal()">
 
-  <img
-    [src]="selectedImage"
-    class="fullscreen-image"
-    (click)="$event.stopPropagation()"
-  >
+  <img [src]="selectedImage" class="fullscreen-image" (click)="$event.stopPropagation()">
 
 </div>
 }

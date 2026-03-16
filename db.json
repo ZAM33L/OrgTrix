@@ -58,15 +58,6 @@
               "priority": "Medium",
               "dueDate": "2026-03-04T18:30:00.000Z",
               "enteredDate": "2026-03-02T18:30:00.000Z"
-            },
-            {
-              "id": 1773394052582,
-              "title": "img view",
-              "description": "",
-              "priority": "Medium",
-              "dueDate": "2026-03-26T18:30:00.000Z",
-              "enteredDate": "2026-03-13T09:27:09.912Z",
-              "image": "http://localhost:3000/uploads/1773394052197-mrrobot.jpg"
             }
           ]
         },
