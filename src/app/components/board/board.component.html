@@ -174,18 +174,45 @@
 </div>
 
 
-<div class="board-layout" cdkDropListGroup cdkScrollable>
+<div 
+  class="board-layout"
+  cdkDropList
+  [cdkDropListData]="columns"
+  cdkDropListOrientation="horizontal"
+  (cdkDropListDropped)="dropColumn($event)"
+  [cdkDropListDisabled]="!isDesktop"
+  cdkScrollable
+>
 
   @for (column of columns; track column.id) {
-  <app-column [columnId]="column.id" [connectedTo]="connectedColumnIds" [title]="column.title" [tasks]="column.tasks"
-    [color]="column.color" [showAddButton]="true" [showDeleteAll]="true" (addTask)="openAddModal(column.id)"
-    (deleteAll)="openDeleteConfirm(column.id)" (edit)="openEditModal($event)" (delete)="openTaskDeleteConfirm($event)"
-    [isMenuOpen]="activeMenuColumnId === column.id" (menuToggle)="toggleMenu(column.id)"
-    (sort)="sortColumn(column, $event)" [sortField]="column.sortField ?? undefined"
-    [sortDirection]="column.sortDirection ?? undefined" (resetSort)="resetColumnSort(column)"
-    (deleteColumn)="openDeleteColumnConfirm($event)" (taskMoved)="onTaskMoved()" [showOnlyOverdue]="showOnlyOverdue"
-    [showOnlySprintTasks]="showOnlySprintTasks" (imageClicked)="openImageViewer($event)">
-  </app-column>
+    <div class="column-drag-wrapper" cdkDrag [cdkDragDisabled]="!isDesktop">
+      
+      <app-column
+        [columnId]="column.id"
+        [connectedTo]="connectedColumnIds"
+        [title]="column.title"
+        [tasks]="column.tasks"
+        [color]="column.color"
+        [showAddButton]="true"
+        [showDeleteAll]="true"
+        (addTask)="openAddModal(column.id)"
+        (deleteAll)="openDeleteConfirm(column.id)"
+        (edit)="openEditModal($event)"
+        (delete)="openTaskDeleteConfirm($event)"
+        [isMenuOpen]="activeMenuColumnId === column.id"
+        (menuToggle)="toggleMenu(column.id)"
+        (sort)="sortColumn(column, $event)"
+        [sortField]="column.sortField ?? undefined"
+        [sortDirection]="column.sortDirection ?? undefined"
+        (resetSort)="resetColumnSort(column)"
+        (deleteColumn)="openDeleteColumnConfirm($event)"
+        (taskMoved)="onTaskMoved()"
+        [showOnlyOverdue]="showOnlyOverdue"
+        [showOnlySprintTasks]="showOnlySprintTasks"
+        (imageClicked)="openImageViewer($event)">
+      </app-column>
+
+    </div>
   }
 
 </div>

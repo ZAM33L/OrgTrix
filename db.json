@@ -18,113 +18,6 @@
   ],
   "boards": [
     {
-      "id": "e475",
-      "userId": "1e2d6b67-a2aa-4506-8354-568cda2152ac",
-      "columns": [
-        {
-          "id": "todo",
-          "title": "To Do",
-          "color": "red",
-          "tasks": [
-            {
-              "id": 1773389773372,
-              "title": "image verification",
-              "description": "do img verify",
-              "priority": "Medium",
-              "dueDate": "2026-03-12T18:30:00.000Z",
-              "enteredDate": "2026-03-13T08:15:45.678Z",
-              "image": "http://localhost:3000/uploads/1773392087806-jonsnow.jpg"
-            },
-            {
-              "id": 1773000000001,
-              "title": "Sprint task 1",
-              "description": "API integration",
-              "priority": "High",
-              "dueDate": "2026-03-03T18:30:00.000Z",
-              "enteredDate": "2026-03-01T18:30:00.000Z"
-            },
-            {
-              "id": 1773296081252,
-              "title": "day 10",
-              "description": "do work",
-              "priority": "Medium",
-              "dueDate": "2026-03-12T18:30:00.000Z",
-              "enteredDate": "2026-03-12T06:14:27.669Z"
-            },
-            {
-              "id": 1773000000002,
-              "title": "Sprint task 2",
-              "description": "Fix login bug",
-              "priority": "Medium",
-              "dueDate": "2026-03-04T18:30:00.000Z",
-              "enteredDate": "2026-03-02T18:30:00.000Z"
-            }
-          ]
-        },
-        {
-          "id": "progress",
-          "title": "In Progress",
-          "color": "yellow",
-          "tasks": [
-            {
-              "id": 1773324451485,
-              "title": "sprint task week 3",
-              "description": "do work",
-              "priority": "Medium",
-              "dueDate": "2026-03-19T18:30:00.000Z",
-              "enteredDate": "2026-03-12T14:03:06.201Z"
-            },
-            {
-              "id": 1773067157315,
-              "title": "day 8",
-              "description": "do work",
-              "priority": "High",
-              "dueDate": "2026-03-12T18:30:00.000Z",
-              "enteredDate": "2026-03-09T14:37:35.287Z"
-            }
-          ]
-        },
-        {
-          "id": "completed",
-          "title": "Completed",
-          "color": "green",
-          "tasks": [
-            {
-              "id": 1773067055646,
-              "title": "day 7",
-              "description": "do work",
-              "priority": "Medium",
-              "dueDate": "2026-03-12T18:30:00.000Z",
-              "enteredDate": "2026-03-09T14:36:53.107Z"
-            }
-          ]
-        },
-        {
-          "id": "delivered",
-          "title": "Delivered",
-          "color": "blue",
-          "tasks": [
-            {
-              "id": 1773296602681,
-              "title": "sprint task 5",
-              "description": "meet",
-              "priority": "High",
-              "dueDate": "2026-03-12T18:30:00.000Z",
-              "enteredDate": "2026-03-12T06:23:04.169Z"
-            },
-            {
-              "id": 1773067013956,
-              "title": "day 9",
-              "description": "do work",
-              "priority": "Low",
-              "dueDate": "2026-03-11T18:30:00.000Z",
-              "enteredDate": "2026-03-09T14:35:57.436Z"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "id": "qjqMJ3_",
       "userId": "1e86fafa-a435-4bb7-82f9-5651223ceabb",
       "columns": [
@@ -175,6 +68,36 @@
               "enteredDate": "2026-03-11T07:39:27.381Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "LV9iVZ6",
+      "userId": "1e2d6b67-a2aa-4506-8354-568cda2152ac",
+      "columns": [
+        {
+          "id": "todo",
+          "title": "To Do",
+          "color": "red",
+          "tasks": []
+        },
+        {
+          "id": "progress",
+          "title": "In Progress",
+          "color": "yellow",
+          "tasks": []
+        },
+        {
+          "id": "completed",
+          "title": "Completed",
+          "color": "green",
+          "tasks": []
+        },
+        {
+          "id": "delivered",
+          "title": "Delivered",
+          "color": "blue",
+          "tasks": []
         }
       ]
     }

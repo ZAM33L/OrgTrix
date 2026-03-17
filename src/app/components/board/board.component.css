@@ -1311,3 +1311,20 @@ input[type="date"] {
 
   border-radius:8px;
 }
+
+.column-drag-wrapper {
+  flex: 0 0 340px;   /* SAME as :host */
+  display: flex;
+}
+
+/* ===================================== */
+/* DRAG CURSOR (COLUMN LEVEL) */
+/* ===================================== */
+
+.cdk-drag {
+  cursor: grab;
+}
+
+.cdk-drag.cdk-drag-disabled {
+  cursor: default;
+}

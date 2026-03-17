@@ -2,6 +2,7 @@ import { Component, HostListener, OnInit, NgZone, ChangeDetectorRef, OnDestroy }
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OverlayModule, ConnectedPosition } from '@angular/cdk/overlay';
+import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 
 import { Task } from '../../models/task.model';
 import { Column } from '../../models/column.model';
@@ -27,7 +28,8 @@ import { Observable, forkJoin, of } from 'rxjs';
     FormsModule,
     ColumnComponent,
     OverlayModule,
-    ScrollingModule
+    ScrollingModule,
+    DragDropModule
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.css']
@@ -50,6 +52,19 @@ export class BoardComponent implements OnInit, OnDestroy {
   // INIT
   // =============================
 
+  isDesktop = true;
+
+
+
+  @HostListener('window:resize')
+  onResize() {
+    this.checkScreen();
+  }
+
+  checkScreen() {
+    this.isDesktop = window.innerWidth >= 1024;
+  }
+
   ngOnInit() {
     console.log('BoardComponent initialized');
     const user = this.authService.getCurrentUser();
@@ -62,10 +77,11 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.currentUser = user;
     this.loadBoard();
 
-    // --- ADD THIS ---
     this.popupSub = this.popupService.closeAllPopups$.subscribe(() => {
       this.closeAllPopups();
     });
+
+    this.checkScreen();
   }
 
   ngOnDestroy() {
@@ -1794,6 +1810,27 @@ export class BoardComponent implements OnInit, OnDestroy {
   closeImageModal() {
     this.imageModalOpen = false;
   }
+
+  //drag and drop columns
+  dropColumn(event: CdkDragDrop<any[]>) {
+    console.log('Column drag detected');
+
+    if (event.previousIndex === event.currentIndex) return;
+
+    moveItemInArray(
+      this.columns,
+      event.previousIndex,
+      event.currentIndex
+    );
+
+    console.log('New column order:', this.columns);
+
+    // reuse your existing logic
+    this.saveBoard();
+    this.updateBoardStats();
+  }
+
+
 
 }
 
